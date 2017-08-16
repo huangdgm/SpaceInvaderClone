@@ -61,9 +61,6 @@ InputHandler::ProcessInput(Game& game)
 	// The SDL_PollEvent() function takes a pointer to an SDL_Event structure that is to be filled with event information.
 	while (SDL_PollEvent(&e) != 0)
 	{
-		string str = to_string(e.jbutton.button);
-		LogManager::GetInstance().Log(str.c_str());
-
 		switch (e.type)
 		{
 		case SDL_QUIT:
@@ -87,9 +84,9 @@ InputHandler::ProcessInput(Game& game)
 			{
 				game.MoveSpaceShipRight();
 			}
-			else if (e.jhat.value == 247)
+			else if (e.jhat.value == SDL_HAT_CENTERED)
 			{
-				game.StopSpaceShip();	// doesn't work
+				game.StopSpaceShip();
 			}
 
 			break;
