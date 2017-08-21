@@ -183,6 +183,9 @@ Game::Process(float deltaTime)
 	// W03.3: For each alien enemy
 	// W03.3: Check collision between two entities.
 
+	//vector<Bullet*>::iterator bulletIt;
+	//vector<Enemy*>::iterator enemyIt;
+
 	for (vector<Bullet*>::iterator bulletIt = bulletContainer.begin(); bulletIt != bulletContainer.end();)
 	{
 		for (vector<Enemy*>::iterator enemyIt = enemyContainer.begin(); enemyIt != enemyContainer.end();)
@@ -192,7 +195,11 @@ Game::Process(float deltaTime)
 				bulletContainer.erase(bulletIt);
 				enemyContainer.erase(enemyIt);
 			}
+
+			enemyIt++;
 		}
+
+		bulletIt++;
 	}
 
 	//for (Bullet* bullet : bulletContainer)
