@@ -63,6 +63,12 @@ Game::~Game()
 {
 	delete m_pBackBuffer;
 	m_pBackBuffer = 0;
+
+	delete m_pInputHandler;
+	m_pInputHandler = 0;
+
+	delete m_pPlayerShip;
+	m_pPlayerShip = 0;
 }
 
 bool

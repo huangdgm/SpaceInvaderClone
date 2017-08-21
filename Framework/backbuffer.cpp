@@ -35,6 +35,9 @@ BackBuffer::~BackBuffer()
 	SDL_DestroyWindow(m_pWindow);
 	m_pWindow = 0;
 
+	delete m_pTextureManager;
+	m_pTextureManager = 0;
+
 	IMG_Quit();
 	SDL_Quit();
 }

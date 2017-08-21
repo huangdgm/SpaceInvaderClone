@@ -18,7 +18,12 @@ TextureManager::TextureManager()
 
 TextureManager::~TextureManager()
 {
-
+	// delete all the Texture
+	for (std::map<std::string, Texture*>::iterator it = m_pLoadedTextures.begin(); it != m_pLoadedTextures.end(); ++it)
+	{
+		delete it->second;
+		it->second = 0;
+	}
 }
 
 bool 
@@ -38,6 +43,7 @@ TextureManager::GetTexture(const char* pcFilename)
 	{
 		// Not already loaded... so load...
 		pTexture = new Texture();
+
 		if (!pTexture->Initialise(pcFilename, m_pRenderer))
 		{
 			LogManager::GetInstance().Log("Texture failed to initialise!");
