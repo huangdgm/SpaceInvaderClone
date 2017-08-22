@@ -90,6 +90,25 @@ InputHandler::ProcessInput(Game& game)
 			}
 
 			break;
+		case SDL_KEYDOWN:
+			if (e.key.keysym.sym == SDLK_RIGHT)
+			{
+				game.MoveSpaceShipRight();
+			}
+			else if (e.key.keysym.sym == SDLK_LEFT)
+			{
+				game.MoveSpaceShipLeft();
+			}
+			else if (e.key.keysym.sym == SDLK_SPACE)
+			{
+				game.FireSpaceShipBullet();
+			}
+
+			break;
+		case SDL_KEYUP:
+			game.StopSpaceShip();
+
+			break;
 		}
 	}
 }

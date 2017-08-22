@@ -10,8 +10,6 @@
 // Library includes:
 #include <cassert>
 #include <Windows.h>
-#include <XInput.h>
-#include <iostream>
 
 // Ensure the constructor chains-up to the super class constructor.
 Enemy::Enemy()
@@ -30,4 +28,6 @@ Enemy::Process(float deltaTime)
 {
 	// Ensure the process method chains-up to the super class process method.
 	Entity::Process(deltaTime);
+
+	// dong: no need to perform boundary check, as the position doesn't change
 }

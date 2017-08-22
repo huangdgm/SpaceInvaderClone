@@ -7,6 +7,7 @@ class LogManager
 	//Member Methods:
 public:
 	static LogManager& GetInstance();
+	static void DestroyInstance();
 	~LogManager();
 
 	void Log(const char* pcMessage);

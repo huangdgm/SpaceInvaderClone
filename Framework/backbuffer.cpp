@@ -162,6 +162,7 @@ BackBuffer::CreateSprite(const char* pcFilename)
 	Texture* pTexture = m_pTextureManager->GetTexture(pcFilename);
 
 	Sprite* pSprite = new Sprite();
+
 	if (!pSprite->Initialise(*pTexture))
 	{
 		LogManager::GetInstance().Log("Sprite Failed to Create!");

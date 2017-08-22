@@ -44,6 +44,8 @@ Entity::Process(float deltaTime)
 	m_y += m_velocityY * deltaTime;
 
 	// W03.1: Boundary checking and position capping.
+	// dong: General boundary check. Subclasses may need to modify the boundary accordingly.
+	// dong: Here, only horizontal boundary check is performed.
 	if (m_x <= 0)
 	{
 		m_x = 0;
@@ -53,14 +55,14 @@ Entity::Process(float deltaTime)
 		m_x = 800;
 	}
 
-	/*if (m_y <= 0)
-	{
-		m_y = 0;
-	}
-	else if (m_y >= 600)
-	{
-		m_y = 600;
-	}*/
+	//if (m_y <= 0)
+	//{
+	//	m_y = 0;
+	//}
+	//else if (m_y >= 600)
+	//{
+	//	m_y = 600;
+	//}
 }
 
 void 
@@ -82,8 +84,8 @@ Entity::IsCollidingWith(Entity& e)
 
 	// W03.3: Does this object collide with the e object?
 	// W03.3: Create a circle for each entity (this and e).
-	double radiusOfEnemy = sqrt(32 * 32 + 32 * 32);
-	double radiusOfBullet = sqrt(16 * 16 + 16 * 16);
+	double radiusOfEnemy = sqrt(32 * 32 + 32 * 32) / 2;
+	double radiusOfBullet = sqrt(16 * 16 + 16 * 16) / 2;
 	
 	distance = sqrt(pow((e.GetPositionX() - this->GetPositionX()), 2) + pow((e.GetPositionY() - this->GetPositionY()), 2));
 

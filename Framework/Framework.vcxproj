@@ -82,6 +82,7 @@
   <ItemGroup>
     <ClInclude Include="backbuffer.h" />
     <ClInclude Include="bullet.h" />
+    <ClInclude Include="C:\Users\Administrator.USER-20170719IF\Dropbox\AUT\COMP710 - Game Programming\w03\6_supporting files\animatedsprite.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="game.h" />
@@ -95,6 +96,7 @@
   <ItemGroup>
     <ClCompile Include="backbuffer.cpp" />
     <ClCompile Include="bullet.cpp" />
+    <ClCompile Include="C:\Users\Administrator.USER-20170719IF\Dropbox\AUT\COMP710 - Game Programming\w03\6_supporting files\animatedsprite.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="game.cpp" />

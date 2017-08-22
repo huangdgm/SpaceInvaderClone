@@ -71,12 +71,22 @@ protected:
 	// W03.1: Add a PlayerShip field.
 	PlayerShip* m_pPlayerShip;
 	// W03.2: Add an alien enemy container field.
-	vector<Enemy*> enemyContainer;
-	// list<Enemy*> enemyContainer;
-	// int*[] enemyArray;
+	//vector<Enemy*> enemyContainer;
 	// W03.3: Add a bullet container field.
-	vector<Bullet*> bulletContainer;
-	// list<Bullet*> bulletContainer;
+	//vector<Bullet*> bulletContainer;
+
+	Sprite* m_pEnemySprite;
+	Sprite* m_pPlayerSprite;
+	Sprite* m_pPlayerBulletSprite;
+
+	Enemy* m_enemy2DArray[4][14];
+	Bullet* m_bulletArray[30];
+
+	const int m_numOfEnemyRows;
+	const int m_numOfEnemyCols;
+
+	const int m_maxNumOfBullets;
+	int m_indexOfBullet;
 
 private:
 

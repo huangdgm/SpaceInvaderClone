@@ -55,6 +55,10 @@ Game::Game()
 , m_numUpdates(0)
 , m_lastTime(0)
 , m_lag(0)
+, m_numOfEnemyRows(4)
+, m_numOfEnemyCols(14)
+, m_maxNumOfBullets(100)
+, m_indexOfBullet(0)
 {
 
 }
@@ -69,6 +73,30 @@ Game::~Game()
 
 	delete m_pPlayerShip;
 	m_pPlayerShip = 0;
+
+	for (int row = 0; row < m_numOfEnemyRows; row++)
+	{
+		for (int col = 0; col < m_numOfEnemyCols; col++)
+		{
+			delete m_enemy2DArray[row][col];
+			m_enemy2DArray[row][col] = 0;
+		}
+	}
+
+	for (int index = 0; index < m_indexOfBullet; index++)
+	{
+		delete m_bulletArray[index];
+		m_bulletArray[index] = 0;
+	}
+
+	delete m_pEnemySprite;
+	m_pEnemySprite = 0;
+
+	delete m_pPlayerSprite;
+	m_pPlayerSprite = 0;
+
+	delete m_pPlayerBulletSprite;
+	m_pPlayerBulletSprite = 0;
 }
 
 bool
@@ -76,9 +104,6 @@ Game::Initialise()
 {
 	const int width = 800;
 	const int height = 600;
-
-	const int numOfEnemyRows = 4;
-	const int numOfEnemyCols = 14;
 
 	m_pBackBuffer = new BackBuffer();
 	if (!m_pBackBuffer->Initialise(width, height))
@@ -96,17 +121,22 @@ Game::Initialise()
 
 	// W03.1: Load the player ship sprite.
 	// For example: Sprite* pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\playership.png");
-	Sprite* pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\playership.png");
+	m_pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\playership.png");
 
 	// W03.1: Create the player ship instance.
 	m_pPlayerShip = new PlayerShip();
-	m_pPlayerShip->Initialise(pPlayerSprite);	// initialise the playerShip with the sprite
+	m_pPlayerShip->Initialise(m_pPlayerSprite);	// initialise the playerShip with the sprite
 
 	// W03.2: Spawn 4 rows, each row with 14 alien enemies.
 	// W03.2: Fill the container with these new enemies.
-	for (int row = 0; row < numOfEnemyRows; row++)
+	// dong: Set the sprite for the enemy. All the enemies share the same sprite.
+	// dong: Set the sprite for the bullet. All the bullets share the same sprite.
+	m_pEnemySprite = m_pBackBuffer->CreateSprite("assets\\alienenemy.png");
+	m_pPlayerBulletSprite = m_pBackBuffer->CreateSprite("assets\\playerbullet.png");
+
+	for (int row = 0; row < m_numOfEnemyRows; row++)
 	{
-		for (int col = 0; col < numOfEnemyCols; col++)
+		for (int col = 0; col < m_numOfEnemyCols; col++)
 		{
 			SpawnEnemy(row, col);
 		}
@@ -168,17 +198,25 @@ Game::Process(float deltaTime)
 	}
 
 	// Update the game world simulation:
-
 	// Ex003.5: Process each alien enemy in the container.
-	for (Enemy* enemy : enemyContainer)
+	for (int row = 0; row < m_numOfEnemyRows; row++)
 	{
-		enemy->Process(deltaTime);
+		for (int col = 0; col < m_numOfEnemyCols; col++)
+		{
+			if (m_enemy2DArray[row][col] != 0)
+			{
+				m_enemy2DArray[row][col]->Process(deltaTime);
+			}
+		}
 	}
 
 	// W03.3: Process each bullet in the container.
-	for (Bullet* bullet : bulletContainer)
+	for (int index = 0; index < m_indexOfBullet; index++)
 	{
-		bullet->Process(deltaTime);
+		if (m_bulletArray[index] != 0)
+		{
+			m_bulletArray[index]->Process(deltaTime);
+		}
 	}
 
 	// W03.1: Update player...
@@ -188,54 +226,23 @@ Game::Process(float deltaTime)
 	// W03.3: For each bullet
 	// W03.3: For each alien enemy
 	// W03.3: Check collision between two entities.
-
-	//vector<Bullet*>::iterator bulletIt;
-	//vector<Enemy*>::iterator enemyIt;
-
-	for (vector<Bullet*>::iterator bulletIt = bulletContainer.begin(); bulletIt != bulletContainer.end();)
+	for (int row = 0; row < m_numOfEnemyRows; row++)
 	{
-		for (vector<Enemy*>::iterator enemyIt = enemyContainer.begin(); enemyIt != enemyContainer.end();)
+		for (int col = 0; col < m_numOfEnemyCols; col++)
 		{
-			if ((**bulletIt).IsCollidingWith(**enemyIt))
+			for (int index = 0; index < m_indexOfBullet; index++)
 			{
-				bulletContainer.erase(bulletIt);
-				enemyContainer.erase(enemyIt);
+				if (m_bulletArray[index] != 0 && m_enemy2DArray[row][col] != 0)
+				{
+					if ((*m_bulletArray[index]).IsCollidingWith(*m_enemy2DArray[row][col]))
+					{
+						m_bulletArray[index] = 0;
+						m_enemy2DArray[row][col] = 0;
+					}
+				}
 			}
-
-			enemyIt++;
 		}
-
-		bulletIt++;
 	}
-
-	//for (Bullet* bullet : bulletContainer)
-	//{
-	//	for (Enemy* enemy : enemyContainer)
-	//	{
-	//		if (bullet != 0 && enemy != 0)
-	//		{
-	//			if (bullet->IsCollidingWith(*enemy))
-	//			{
-	//				bullet->SetDead(true);
-	//				enemy->SetDead(true);
-
-	//				// W03.3: If collided, destory both and spawn explosion.
-	//				// W03.3: Remove any dead bullets from the container...
-	//				// W03.3: Remove any dead enemy aliens from the container...
-	//				// enemyContainer.erase(std::remove(enemyContainer.begin(), enemyContainer.end(), bullet), enemyContainer.end());
-	//				//std::vector<Enemy*>::iterator it = enemyContainer.begin();
-	//				//enemyContainer.
-	//				//enemyContainer.remove(enemy);
-	//				//bulletContainer.remove(bullet);
-
-	//				// enemyContainer.erase(distance(enemyContainer.begin(), find(enemyContainer.begin(), enemyContainer.end(), bullet)));
-	//				//std::rotate(it, it + 1, enemyContainer.end());
-	//				//enemyContainer.pop_back();
-	//				// bulletContainer.erase(std::remove(bulletContainer.begin(), bulletContainer.end(), bullet), bulletContainer.end());
-	//			}
-	//		}
-	//	}
-	//}
 
 	// W03.3: Remove any dead explosions from the container...
 }
@@ -248,23 +255,26 @@ Game::Draw(BackBuffer& backBuffer)
 	backBuffer.Clear();
 
 	// W03.2: Draw all enemy aliens in container...
-	for (Enemy* enemy : enemyContainer)
+	for (int row = 0; row < m_numOfEnemyRows; row++)
 	{
-		enemy->Draw(backBuffer);
-
-		/*if (!(enemy->IsDead()))
+		for (int col = 0; col < m_numOfEnemyCols; col++)
 		{
-		}*/
+			// The dead enemy has a value of 0.
+			if (m_enemy2DArray[row][col] != 0)
+			{
+				m_enemy2DArray[row][col]->Draw(backBuffer);
+			}
+		}
 	}
 
 	// W03.3: Draw all bullets in container...
-	for (Bullet* bullet : bulletContainer)
+	for (int index = 0; index < m_indexOfBullet; index++)
 	{
-		bullet->Draw(backBuffer);
-
-		/*if (!(bullet->IsDead()))
+		// The dead bullet has a value of 0.
+		if (m_bulletArray[index] != 0)
 		{
-		}*/
+			m_bulletArray[index]->Draw(backBuffer);
+		}
 	}
 
 	// W03.1: Draw the player ship...
@@ -306,7 +316,6 @@ void
 Game::FireSpaceShipBullet()
 {
 	// W03.3: Load the player bullet sprite.
-	Sprite* pPlayerBulletSprite = m_pBackBuffer->CreateSprite("assets\\playerbullet.png");
 
 	// W03.3: Create a new bullet object.
 	Bullet* bullet = new Bullet();
@@ -314,13 +323,21 @@ Game::FireSpaceShipBullet()
 	// Initialise the initial position and the sprite of the bullet.
 	bullet->SetPositionY(552.0f);
 	bullet->SetPositionX(m_pPlayerShip->GetPositionX() + 8.0f);
-	bullet->Initialise(pPlayerBulletSprite);
+	bullet->Initialise(m_pPlayerBulletSprite);
 
 	// W03.3: Set the bullets vertical velocity.
-	bullet->SetVerticalVelocity(-100);
+	bullet->SetVerticalVelocity(-150);
 
 	// W03.3: Add the new bullet to the bullet container.
-	bulletContainer.push_back(bullet);
+	if (m_indexOfBullet < m_maxNumOfBullets)
+	{
+		m_bulletArray[m_indexOfBullet] = bullet;
+		m_indexOfBullet++;
+	}
+	else
+	{
+		m_indexOfBullet = 0;
+	}
 }
 
 // W03.2: Spawn a Enemy in game.
@@ -331,11 +348,9 @@ Game::SpawnEnemy(int row, int col)
 	Enemy* enemy = new Enemy();
 
 	// W03.2: Load the alien enemy sprite file.
-	Sprite* pEnemySprite = m_pBackBuffer->CreateSprite("assets\\alienenemy.png");
-
-	enemy->Initialise(pEnemySprite);
+	enemy->Initialise(m_pEnemySprite);
 	enemy->SetPosition(59.0f*col, 59.0f*row);
 
 	// W03.2: Add the new Enemy to the enemy container.
-	enemyContainer.push_back(enemy);
+	m_enemy2DArray[row][col] = enemy;
 }

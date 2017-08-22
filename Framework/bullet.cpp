@@ -30,10 +30,6 @@ Bullet::Process(float deltaTime)
 {
 	// Ensure the process method chains-up to the super class process method.
 	Entity::Process(deltaTime);
-}
 
-void
-Bullet::Initialise(Sprite* sprite)
-{
-	Entity::Initialise(sprite);
+
 }

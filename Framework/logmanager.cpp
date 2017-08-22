@@ -41,3 +41,10 @@ LogManager::Log(const char* pcMessage)
 	OutputDebugStringA(pcMessage);
 	OutputDebugStringA("\n"); 
 }
+
+void
+LogManager::DestroyInstance()
+{
+	delete sm_pInstance;
+	sm_pInstance = 0;
+}
