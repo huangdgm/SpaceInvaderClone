@@ -58,7 +58,17 @@ Game::Game()
 , m_lag(0)
 , m_indexOfBullet(0)
 , m_indexOfExplosion(0)
+, m_indexOfAnimatedSprite(0)
 {
+	// Dong: Initialise all the elements in the enemy array to zero.
+	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
+	{
+		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
+		{
+			m_enemy2DArray[row][col] = 0;
+		}
+	}
+
 	// Dong: Initialise all the elements in the bullet array to zero.
 	for (int index = 0; index < m_maxNumOfBullets; index++)
 	{
@@ -69,6 +79,12 @@ Game::Game()
 	for (int index = 0; index < m_maxNumOfExplosions; index++)
 	{
 		m_explosionArray[index] = 0;
+	}
+
+	// Dong: Initialise all the elements in the animated sprit array to zero.
+	for (int index = 0; index < m_maxNumOfAnimatedSprite; index++)
+	{
+		m_AnimatedSpriteArray[index] = 0;
 	}
 }
 
@@ -112,6 +128,12 @@ Game::~Game()
 
 	delete m_pPlayerBulletSprite;
 	m_pPlayerBulletSprite = 0;
+
+	for (int index = 0; index < m_maxNumOfAnimatedSprite; index++)
+	{
+		delete m_AnimatedSpriteArray[index];
+		m_AnimatedSpriteArray[index] = 0;
+	}
 }
 
 bool
@@ -157,9 +179,6 @@ Game::Initialise()
 			SpawnEnemy(row, col);
 		}
 	}
-
-	// Load the animated sprite.
-	m_pAnimatedSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png");
 
 	m_lastTime = SDL_GetTicks();
 	m_lag = 0.0f;
@@ -218,6 +237,7 @@ Game::Process(float deltaTime)
 
 	// Update the game world simulation:
 	// Ex003.5: Process each alien enemy in the container.
+	// Dong: Only process the enemy when this enemy is alive.
 	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
 		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
@@ -256,16 +276,7 @@ Game::Process(float deltaTime)
 				{
 					if ((*m_bulletArray[index]).IsCollidingWith(*m_enemy2DArray[row][col]))
 					{
-						Explosion* explosion = new Explosion();
-						
-						explosion->Initialise(m_pAnimatedSprite);
-						explosion->SetPositionX(m_bulletArray[index]->GetPositionX());
-						explosion->SetPositionY(m_bulletArray[index]->GetPositionY());
-
-						if (m_indexOfExplosion < m_maxNumOfExplosions)
-						{
-							m_explosionArray[m_indexOfExplosion++] = explosion;
-						}
+						SpawnExplosion(row, col);
 
 						// Set the value of dead enemy and dead bullet to zero.
 						m_bulletArray[index] = 0;
@@ -278,7 +289,7 @@ Game::Process(float deltaTime)
 
 	for (int index = 0; index < Game::m_maxNumOfExplosions; index++)
 	{
-		if (m_explosionArray[index] && m_explosionArray[index]->IsExplosing())
+		if (m_explosionArray[index] != 0 && m_explosionArray[index]->IsExplosing())
 		{
 			m_explosionArray[index]->Process(deltaTime);
 		}
@@ -406,4 +417,24 @@ Game::SpawnEnemy(int row, int col)
 
 	// W03.2: Add the new Enemy to the enemy container.
 	m_enemy2DArray[row][col] = enemy;
+}
+
+void
+Game::SpawnExplosion(int row, int col)
+{
+	Explosion* explosion = new Explosion();
+
+	// Load a animated sprite for each explosion.
+	AnimatedSprite* m_pAnimatedSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png");
+
+	m_AnimatedSpriteArray[m_indexOfAnimatedSprite++] = m_pAnimatedSprite;
+
+	explosion->Initialise(m_pAnimatedSprite);
+	explosion->SetPositionX(59.0f*col);
+	explosion->SetPositionY(59.0f*row);
+
+	if (m_indexOfExplosion < m_maxNumOfExplosions)
+	{
+		m_explosionArray[m_indexOfExplosion++] = explosion;
+	}
 }

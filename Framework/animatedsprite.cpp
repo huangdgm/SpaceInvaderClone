@@ -26,7 +26,7 @@ bool
 AnimatedSprite::Initialise(Texture& texture)
 {
 	m_frameWidth = 0;
-	m_frameSpeed = 0.1f;
+	m_frameSpeed = 0.06f;
 
 	m_loop = false;
 	m_paused = false;

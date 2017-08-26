@@ -70,7 +70,7 @@ protected:
 	Sprite* m_pEnemySprite;
 	Sprite* m_pPlayerSprite;
 	Sprite* m_pPlayerBulletSprite;
-	AnimatedSprite* m_pAnimatedSprite;
+	AnimatedSprite* m_AnimatedSpriteArray[56];
 
 	// Game Entities:
 	// W03.1: Add a PlayerShip field.
@@ -84,13 +84,17 @@ protected:
 
 	const static int m_numOfEnemyRows = 4;
 	const static int m_numOfEnemyCols = 14;
+
 	const static int m_maxNumOfBullets = 30;
 	const static int m_maxNumOfExplosions = 56;
+	const static int m_maxNumOfAnimatedSprite = 56;
+
 	const static int m_velocityOfBullet = -300;
 	const static int m_velocityOfPlayerShip = 200;
 
 	int m_indexOfBullet;
 	int m_indexOfExplosion;
+	int m_indexOfAnimatedSprite;
 
 private:
 
