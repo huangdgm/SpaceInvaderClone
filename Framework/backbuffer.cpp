@@ -9,6 +9,7 @@
 #include "sprite.h"
 #include "animatedsprite.h"
 #include "texture.h"
+#include "game.h"
 
 // Library includes:
 #include <SDL.h>
@@ -138,13 +139,13 @@ BackBuffer::DrawAnimatedSprite(AnimatedSprite& animatedSprite)
 
 	src.x = animatedSprite.GetFrameCoordinate(animatedSprite.GetCurrentFrame());
 	src.y = 0;
-	src.w = 64;
-	src.h = 64;
+	src.w = Game::m_widthOfAnimatedSpriteFrame;
+	src.h = Game::m_heigthOfAnimatedSpriteFrame;
 
 	dest.x = animatedSprite.GetX();
 	dest.y = animatedSprite.GetY();
-	dest.w = 64; //animatedSprite.GetWidth();
-	dest.h = 64; //animatedSprite.GetHeight();
+	dest.w = Game::m_widthOfAnimatedSpriteFrame;
+	dest.h = Game::m_heigthOfAnimatedSpriteFrame;
 
 	SDL_RenderCopy(m_pRenderer, animatedSprite.GetTexture()->GetTexture(), &src, &dest);
 }

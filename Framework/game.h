@@ -51,6 +51,9 @@ public:
 	const static int m_widthOfWindow = 800;
 	const static int m_heightOfWindow = 600;
 
+	const static int m_widthOfAnimatedSpriteFrame = 64;
+	const static int m_heigthOfAnimatedSpriteFrame = 64;
+
 protected:
 	static Game* sm_pInstance;
 	BackBuffer* m_pBackBuffer;
