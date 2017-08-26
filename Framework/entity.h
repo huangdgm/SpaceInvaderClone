@@ -11,17 +11,17 @@ class Entity
 	//Member Methods:
 public:
 	Entity();
-	~Entity();	// make it virtual, because there exists other virtual methods within the same class definition
+	~Entity();
 
 	bool Initialise(Sprite* sprite);
 
-	void Process(float deltaTime);	// make it virtual
+	void Process(float deltaTime);
 	void Draw(BackBuffer& backBuffer);
 
 	void SetDead(bool dead);
 	bool IsDead() const;
 
-	bool IsCollidingWith(Entity& e);
+	bool IsCollidingWith(Entity& e);	// Not IsCollidingWith(const Entity& e), because the method may change the entity e.
 
 	void SetPosition(float x, float y);
 	void SetPositionX(float x);

@@ -10,8 +10,8 @@ class Bullet : public Entity
 public:
 	Bullet();
 	~Bullet();
+
 	void Process(float deltaTime);
-	// Initialise(Sprite* sprite);
 
 protected:
 

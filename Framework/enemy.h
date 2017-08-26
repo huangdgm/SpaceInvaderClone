@@ -10,6 +10,7 @@ class Enemy : public Entity
 public:
 	Enemy();
 	~Enemy();
+
 	void Process(float deltaTime);
 
 protected:

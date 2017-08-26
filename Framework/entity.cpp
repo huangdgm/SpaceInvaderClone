@@ -33,7 +33,7 @@ Entity::Initialise(Sprite* sprite)	// Why Sprite*, not Sprite&
 	assert(sprite);
 	m_pSprite = sprite;
 
-	return (true);	// If the initilisation is successful, return true.
+	return (true);	// If the initilisation is successful, return true, otherwise, assert will stop the executing of the program.
 }
 
 void
@@ -54,15 +54,6 @@ Entity::Process(float deltaTime)
 	{
 		m_x = 800;
 	}
-
-	//if (m_y <= 0)
-	//{
-	//	m_y = 0;
-	//}
-	//else if (m_y >= 600)
-	//{
-	//	m_y = 600;
-	//}
 }
 
 void 

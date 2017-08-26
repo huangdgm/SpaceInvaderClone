@@ -48,7 +48,10 @@
     <ClInclude Include="bullet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\Administrator.USER-20170719IF\Dropbox\AUT\COMP710 - Game Programming\w03\6_supporting files\animatedsprite.h">
+    <ClInclude Include="animatedsprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="explosion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,7 +92,10 @@
     <ClCompile Include="bullet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\Administrator.USER-20170719IF\Dropbox\AUT\COMP710 - Game Programming\w03\6_supporting files\animatedsprite.cpp">
+    <ClCompile Include="animatedsprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="explosion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

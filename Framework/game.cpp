@@ -11,6 +11,7 @@
 #include "playership.h"
 #include "bullet.h"
 #include "enemy.h"
+#include "explosion.h"
 
 // Library includes:
 #include <cassert>
@@ -55,12 +56,20 @@ Game::Game()
 , m_numUpdates(0)
 , m_lastTime(0)
 , m_lag(0)
-, m_numOfEnemyRows(4)
-, m_numOfEnemyCols(14)
-, m_maxNumOfBullets(100)
 , m_indexOfBullet(0)
+, m_indexOfExplosion(0)
 {
+	// Dong: Initialise all the elements in the bullet array to zero.
+	for (int index = 0; index < m_maxNumOfBullets; index++)
+	{
+		m_bulletArray[index] = 0;
+	}
 
+	// Dong: Initialise all the elements in the explosion array to zero.
+	for (int index = 0; index < m_maxNumOfExplosions; index++)
+	{
+		m_explosionArray[index] = 0;
+	}
 }
 
 Game::~Game()
@@ -74,19 +83,25 @@ Game::~Game()
 	delete m_pPlayerShip;
 	m_pPlayerShip = 0;
 
-	for (int row = 0; row < m_numOfEnemyRows; row++)
+	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
-		for (int col = 0; col < m_numOfEnemyCols; col++)
+		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
 		{
 			delete m_enemy2DArray[row][col];
 			m_enemy2DArray[row][col] = 0;
 		}
 	}
 
-	for (int index = 0; index < m_indexOfBullet; index++)
+	for (int index = 0; index < m_maxNumOfBullets; index++)
 	{
 		delete m_bulletArray[index];
 		m_bulletArray[index] = 0;
+	}
+
+	for (int index = 0; index < m_maxNumOfExplosions; index++)
+	{
+		delete m_explosionArray[index];
+		m_explosionArray[index] = 0;
 	}
 
 	delete m_pEnemySprite;
@@ -102,17 +117,18 @@ Game::~Game()
 bool
 Game::Initialise()
 {
-	const int width = 800;
-	const int height = 600;
-
+	// Dong: Create the back buffer
 	m_pBackBuffer = new BackBuffer();
-	if (!m_pBackBuffer->Initialise(width, height))
+
+	if (!m_pBackBuffer->Initialise(Game::m_widthOfWindow, Game::m_heightOfWindow))
 	{
 		LogManager::GetInstance().Log("BackBuffer Init Fail!");
 		return (false);
 	}
 
+	// Dong: Create the input handler.
 	m_pInputHandler = new InputHandler();
+
 	if (!m_pInputHandler->Initialise())
 	{
 		LogManager::GetInstance().Log("InputHandler Init Fail!");
@@ -120,27 +136,30 @@ Game::Initialise()
 	}
 
 	// W03.1: Load the player ship sprite.
-	// For example: Sprite* pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\playership.png");
-	m_pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\playership.png");
-
 	// W03.1: Create the player ship instance.
 	m_pPlayerShip = new PlayerShip();
+	m_pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\playership.png");
 	m_pPlayerShip->Initialise(m_pPlayerSprite);	// initialise the playerShip with the sprite
 
 	// W03.2: Spawn 4 rows, each row with 14 alien enemies.
 	// W03.2: Fill the container with these new enemies.
 	// dong: Set the sprite for the enemy. All the enemies share the same sprite.
 	// dong: Set the sprite for the bullet. All the bullets share the same sprite.
+	// dong: Because all the enemies share the same sprite, so all the enemies share the same texture instance. This is true for the bullet as well.
 	m_pEnemySprite = m_pBackBuffer->CreateSprite("assets\\alienenemy.png");
 	m_pPlayerBulletSprite = m_pBackBuffer->CreateSprite("assets\\playerbullet.png");
 
-	for (int row = 0; row < m_numOfEnemyRows; row++)
+	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
-		for (int col = 0; col < m_numOfEnemyCols; col++)
+		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
 		{
+			// dong: Create a new enemy and place it at the specified row and column.
 			SpawnEnemy(row, col);
 		}
 	}
+
+	// Load the animated sprite.
+	m_pAnimatedSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png");
 
 	m_lastTime = SDL_GetTicks();
 	m_lag = 0.0f;
@@ -199,11 +218,11 @@ Game::Process(float deltaTime)
 
 	// Update the game world simulation:
 	// Ex003.5: Process each alien enemy in the container.
-	for (int row = 0; row < m_numOfEnemyRows; row++)
+	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
-		for (int col = 0; col < m_numOfEnemyCols; col++)
+		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
 		{
-			if (m_enemy2DArray[row][col] != 0)
+			if (m_enemy2DArray[row][col])
 			{
 				m_enemy2DArray[row][col]->Process(deltaTime);
 			}
@@ -211,9 +230,10 @@ Game::Process(float deltaTime)
 	}
 
 	// W03.3: Process each bullet in the container.
-	for (int index = 0; index < m_indexOfBullet; index++)
+	// Dong: Only process the bullet when this bullet is alive.
+	for (int index = 0; index < m_maxNumOfBullets; index++)
 	{
-		if (m_bulletArray[index] != 0)
+		if (m_bulletArray[index])
 		{
 			m_bulletArray[index]->Process(deltaTime);
 		}
@@ -226,21 +246,41 @@ Game::Process(float deltaTime)
 	// W03.3: For each bullet
 	// W03.3: For each alien enemy
 	// W03.3: Check collision between two entities.
-	for (int row = 0; row < m_numOfEnemyRows; row++)
+	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
-		for (int col = 0; col < m_numOfEnemyCols; col++)
+		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
 		{
-			for (int index = 0; index < m_indexOfBullet; index++)
+			for (int index = 0; index < Game::m_maxNumOfBullets; index++)
 			{
 				if (m_bulletArray[index] != 0 && m_enemy2DArray[row][col] != 0)
 				{
 					if ((*m_bulletArray[index]).IsCollidingWith(*m_enemy2DArray[row][col]))
 					{
+						Explosion* explosion = new Explosion();
+						
+						explosion->Initialise(m_pAnimatedSprite);
+						explosion->SetPositionX(m_bulletArray[index]->GetPositionX());
+						explosion->SetPositionY(m_bulletArray[index]->GetPositionY());
+
+						if (m_indexOfExplosion < m_maxNumOfExplosions)
+						{
+							m_explosionArray[m_indexOfExplosion++] = explosion;
+						}
+
+						// Set the value of dead enemy and dead bullet to zero.
 						m_bulletArray[index] = 0;
 						m_enemy2DArray[row][col] = 0;
 					}
 				}
 			}
+		}
+	}
+
+	for (int index = 0; index < Game::m_maxNumOfExplosions; index++)
+	{
+		if (m_explosionArray[index] && m_explosionArray[index]->IsExplosing())
+		{
+			m_explosionArray[index]->Process(deltaTime);
 		}
 	}
 
@@ -255,12 +295,12 @@ Game::Draw(BackBuffer& backBuffer)
 	backBuffer.Clear();
 
 	// W03.2: Draw all enemy aliens in container...
-	for (int row = 0; row < m_numOfEnemyRows; row++)
+	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
-		for (int col = 0; col < m_numOfEnemyCols; col++)
+		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
 		{
 			// The dead enemy has a value of 0.
-			if (m_enemy2DArray[row][col] != 0)
+			if (m_enemy2DArray[row][col])
 			{
 				m_enemy2DArray[row][col]->Draw(backBuffer);
 			}
@@ -268,10 +308,10 @@ Game::Draw(BackBuffer& backBuffer)
 	}
 
 	// W03.3: Draw all bullets in container...
-	for (int index = 0; index < m_indexOfBullet; index++)
+	for (int index = 0; index < Game::m_maxNumOfBullets; index++)
 	{
 		// The dead bullet has a value of 0.
-		if (m_bulletArray[index] != 0)
+		if (m_bulletArray[index])
 		{
 			m_bulletArray[index]->Draw(backBuffer);
 		}
@@ -279,6 +319,15 @@ Game::Draw(BackBuffer& backBuffer)
 
 	// W03.1: Draw the player ship...
 	m_pPlayerShip->Draw(backBuffer);
+
+	// Dong: Draw the explosion only if the explosion is ongoing.
+	for (int index = 0; index < Game::m_maxNumOfExplosions; index++)
+	{
+		if (m_explosionArray[index] != 0 && m_explosionArray[index]->IsExplosing())
+		{
+			m_explosionArray[index]->Draw(backBuffer);
+		}
+	}
 
 	backBuffer.Present();
 }
@@ -300,7 +349,7 @@ void
 Game::MoveSpaceShipLeft()
 {
 	// W03.1: Tell the player ship to move left.
-	m_pPlayerShip->SetHorizontalVelocity(-50);
+	m_pPlayerShip->SetHorizontalVelocity(Game::m_velocityOfPlayerShip * (-1.0f));
 }
 
 // W03.1: Add the method to tell the player ship to move right...
@@ -308,7 +357,7 @@ void
 Game::MoveSpaceShipRight()
 {
 	// Tell the player ship to move right.
-	m_pPlayerShip->SetHorizontalVelocity(50);
+	m_pPlayerShip->SetHorizontalVelocity(Game::m_velocityOfPlayerShip * 1.0f);
 }
 
 // W03.3: Space a Bullet in game.
@@ -321,12 +370,16 @@ Game::FireSpaceShipBullet()
 	Bullet* bullet = new Bullet();
 
 	// Initialise the initial position and the sprite of the bullet.
-	bullet->SetPositionY(552.0f);
-	bullet->SetPositionX(m_pPlayerShip->GetPositionX() + 8.0f);
 	bullet->Initialise(m_pPlayerBulletSprite);
 
+	float positionX = (m_pPlayerShip->GetPositionX() + (m_pPlayerSprite->GetWidth() - m_pPlayerBulletSprite->GetWidth()) / 2) * 1.0f;
+	float positionY = (Game::m_heightOfWindow - m_pPlayerSprite->GetHeight() - m_pPlayerBulletSprite->GetHeight()) * 1.0f;
+	
+	bullet->SetPositionX(positionX);
+	bullet->SetPositionY(positionY);
+
 	// W03.3: Set the bullets vertical velocity.
-	bullet->SetVerticalVelocity(-150);
+	bullet->SetVerticalVelocity(Game::m_velocityOfBullet * 1.0f);
 
 	// W03.3: Add the new bullet to the bullet container.
 	if (m_indexOfBullet < m_maxNumOfBullets)

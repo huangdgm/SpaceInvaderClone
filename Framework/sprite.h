@@ -33,7 +33,7 @@ public:
 	int GetWidth() const;
 	int GetHeight() const;
 
-	Texture* GetTexture();
+	Texture* GetTexture();	// dong: no SetTexture() method
 
 protected:
 
@@ -46,10 +46,13 @@ public:
 
 protected:
 	Texture* m_pTexture;
+
+	// The position of the upper-left corner of the sprite
 	int m_x;
 	int m_y;
 
 	float m_angle;
+
 	int m_centerX;
 	int m_centerY;	// why need center x and center y?
 

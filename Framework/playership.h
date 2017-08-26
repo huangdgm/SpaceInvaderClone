@@ -9,8 +9,9 @@ class PlayerShip : public Entity
 	//Member Methods:
 public:
 	PlayerShip();
-	~PlayerShip();	// Make it virtual as well, as it is virtual in base class.
-	void Process(float deltaTime);	// Basically, declare the method virtual as well, although it is not necessary to do so.
+	~PlayerShip();
+
+	void Process(float deltaTime);
 	void Initialise(Sprite* sprite);
 
 protected:

@@ -32,8 +32,9 @@ bool
 Sprite::Initialise(Texture& texture)	// Why Texture&, not Texture*?
 {
 	m_pTexture = &texture;
-	assert(m_pTexture);	// assert m_pTexture
+	assert(m_pTexture);
 	
+	// dong: The width and the height are determined by the texture which is associated with the sprite.
 	m_width = m_pTexture->GetWidth();
 	m_height = m_pTexture->GetHeight();
 

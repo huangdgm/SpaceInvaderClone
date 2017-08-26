@@ -5,10 +5,8 @@
 // Local includes:
 #include "enemy.h"
 #include "bullet.h"
-
-// Library includes:
-#include <vector>
-// #include <list>
+#include "animatedsprite.h"
+#include "explosion.h"
 
 // Forward Declarations
 class BackBuffer;
@@ -32,7 +30,7 @@ public:
 
 	void StopSpaceShip();
 	void MoveSpaceShipLeft();
-	void MoveSpaceShipRight();	// move spaceship right
+	void MoveSpaceShipRight();
 	void FireSpaceShipBullet();
 
 	void SpawnEnemy(int x, int y);
@@ -46,10 +44,12 @@ private:
 	Game(const Game& game);
 	Game& operator=(const Game& game);
 	
-	Game();
+	Game();	// Dong: Singleton pattern
 
 	//Member Data:
 public:
+	const static int m_widthOfWindow = 800;
+	const static int m_heightOfWindow = 600;
 
 protected:
 	static Game* sm_pInstance;
@@ -67,26 +67,30 @@ protected:
 	int m_numUpdates;
 	bool m_drawDebugInfo;
 
+	Sprite* m_pEnemySprite;
+	Sprite* m_pPlayerSprite;
+	Sprite* m_pPlayerBulletSprite;
+	AnimatedSprite* m_pAnimatedSprite;
+
 	// Game Entities:
 	// W03.1: Add a PlayerShip field.
 	PlayerShip* m_pPlayerShip;
 	// W03.2: Add an alien enemy container field.
-	//vector<Enemy*> enemyContainer;
-	// W03.3: Add a bullet container field.
-	//vector<Bullet*> bulletContainer;
-
-	Sprite* m_pEnemySprite;
-	Sprite* m_pPlayerSprite;
-	Sprite* m_pPlayerBulletSprite;
-
 	Enemy* m_enemy2DArray[4][14];
+	// W03.3: Add a bullet container field.
 	Bullet* m_bulletArray[30];
+	// Dong: Add a explosion container field.
+	Explosion* m_explosionArray[56];
 
-	const int m_numOfEnemyRows;
-	const int m_numOfEnemyCols;
+	const static int m_numOfEnemyRows = 4;
+	const static int m_numOfEnemyCols = 14;
+	const static int m_maxNumOfBullets = 30;
+	const static int m_maxNumOfExplosions = 56;
+	const static int m_velocityOfBullet = -300;
+	const static int m_velocityOfPlayerShip = 200;
 
-	const int m_maxNumOfBullets;
 	int m_indexOfBullet;
+	int m_indexOfExplosion;
 
 private:
 

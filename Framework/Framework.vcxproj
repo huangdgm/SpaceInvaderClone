@@ -80,11 +80,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="animatedsprite.h" />
     <ClInclude Include="backbuffer.h" />
     <ClInclude Include="bullet.h" />
-    <ClInclude Include="C:\Users\Administrator.USER-20170719IF\Dropbox\AUT\COMP710 - Game Programming\w03\6_supporting files\animatedsprite.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="entity.h" />
+    <ClInclude Include="explosion.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="inputhandler.h" />
     <ClInclude Include="logmanager.h" />
@@ -94,11 +95,12 @@
     <ClInclude Include="texturemanager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="animatedsprite.cpp" />
     <ClCompile Include="backbuffer.cpp" />
     <ClCompile Include="bullet.cpp" />
-    <ClCompile Include="C:\Users\Administrator.USER-20170719IF\Dropbox\AUT\COMP710 - Game Programming\w03\6_supporting files\animatedsprite.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="entity.cpp" />
+    <ClCompile Include="explosion.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="inputhandler.cpp" />
     <ClCompile Include="logmanager.cpp" />
