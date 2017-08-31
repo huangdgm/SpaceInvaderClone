@@ -424,7 +424,7 @@ Game::SpawnExplosion(int row, int col)
 {
 	Explosion* explosion = new Explosion();
 
-	// Load a animated sprite for each explosion.
+	// Load an animated sprite for each explosion.
 	AnimatedSprite* m_pAnimatedSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png");
 
 	m_AnimatedSpriteArray[m_indexOfAnimatedSprite++] = m_pAnimatedSprite;
