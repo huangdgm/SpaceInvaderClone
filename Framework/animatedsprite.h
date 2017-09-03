@@ -2,6 +2,7 @@
 #define __ANIMATEDSPRITE_H__
 
 #include "sprite.h"
+#include "game.h"
 
 class BackBuffer;
 class Texture;

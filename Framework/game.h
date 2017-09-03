@@ -44,7 +44,7 @@ private:
 	Game(const Game& game);
 	Game& operator=(const Game& game);
 	
-	Game();	// Dong: Singleton pattern
+	Game();
 
 	//Member Data:
 public:

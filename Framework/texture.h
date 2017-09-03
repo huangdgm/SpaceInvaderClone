@@ -35,7 +35,7 @@ protected:
 	int m_width;
 	int m_height;
 
-	SDL_RendererFlip m_flip;	// ?
+	SDL_RendererFlip m_flip;
 
 private:
 

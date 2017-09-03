@@ -4,6 +4,7 @@
 // Local includes:
 #include "texture.h"
 #include "backbuffer.h"
+#include "game.h"
 
 AnimatedSprite::AnimatedSprite()
 : m_frameSpeed(0.0f)
