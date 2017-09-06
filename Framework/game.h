@@ -7,6 +7,7 @@
 #include "bullet.h"
 #include "animatedsprite.h"
 #include "explosion.h"
+#include "texture.h"
 
 // Forward Declarations
 class BackBuffer;
@@ -73,16 +74,13 @@ protected:
 	Sprite* m_pEnemySprite;
 	Sprite* m_pPlayerSprite;
 	Sprite* m_pPlayerBulletSprite;
+	Sprite* m_pBackgroundSprite;
+
 	AnimatedSprite* m_AnimatedSpriteArray[56];
 
-	// Game Entities:
-	// W03.1: Add a PlayerShip field.
 	PlayerShip* m_pPlayerShip;
-	// W03.2: Add an alien enemy container field.
 	Enemy* m_enemy2DArray[4][14];
-	// W03.3: Add a bullet container field.
 	Bullet* m_bulletArray[30];
-	// Dong: Add a explosion container field.
 	Explosion* m_explosionArray[56];
 
 	const static int m_numOfEnemyRows = 4;
@@ -98,6 +96,8 @@ protected:
 	int m_indexOfBullet;
 	int m_indexOfExplosion;
 	int m_indexOfAnimatedSprite;
+
+	int m_scrollingOffset;
 
 private:
 

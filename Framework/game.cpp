@@ -59,6 +59,8 @@ Game::Game()
 , m_indexOfBullet(0)
 , m_indexOfExplosion(0)
 , m_indexOfAnimatedSprite(0)
+, m_scrollingOffset(0)
+, m_pBackgroundSprite(0)
 {
 	// Dong: Initialise all the elements in the enemy array to zero.
 	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
@@ -128,12 +130,6 @@ Game::~Game()
 
 	delete m_pPlayerBulletSprite;
 	m_pPlayerBulletSprite = 0;
-
-	for (int index = 0; index < m_maxNumOfAnimatedSprite; index++)
-	{
-		delete m_AnimatedSpriteArray[index];
-		m_AnimatedSpriteArray[index] = 0;
-	}
 }
 
 bool
@@ -179,6 +175,8 @@ Game::Initialise()
 			SpawnEnemy(row, col);
 		}
 	}
+
+	m_pBackgroundSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\background.png");
 
 	m_lastTime = SDL_GetTicks();
 	m_lag = 0.0f;
@@ -305,7 +303,18 @@ Game::Draw(BackBuffer& backBuffer)
 
 	backBuffer.Clear();
 
-	// W03.2: Draw all enemy aliens in container...
+	// Draw the scrolling background.
+	// To make the scrolling slower, the m_scrollingOffset is divided by 60.
+	m_scrollingOffset++;
+
+	if ((m_scrollingOffset / 60) > m_pBackgroundSprite->GetHeight())
+	{
+		m_scrollingOffset = 0;
+	}
+	
+	m_pBackgroundSprite->DrawScrollingBackground(backBuffer, m_scrollingOffset / 60);
+
+	// Draw all enemy aliens in container...
 	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
 		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
@@ -375,8 +384,6 @@ Game::MoveSpaceShipRight()
 void
 Game::FireSpaceShipBullet()
 {
-	// W03.3: Load the player bullet sprite.
-
 	// W03.3: Create a new bullet object.
 	Bullet* bullet = new Bullet();
 

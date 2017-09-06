@@ -34,7 +34,6 @@ Sprite::Initialise(Texture& texture)	// Why Texture&, not Texture*?
 	m_pTexture = &texture;
 	assert(m_pTexture);
 	
-	// dong: The width and the height are determined by the texture which is associated with the sprite.
 	m_width = m_pTexture->GetWidth();
 	m_height = m_pTexture->GetHeight();
 
@@ -51,6 +50,12 @@ void
 Sprite::Draw(BackBuffer& backbuffer)
 {
 	backbuffer.DrawSprite(*this);
+}
+
+void
+Sprite::DrawScrollingBackground(BackBuffer& backbuffer, int scrollingOffset)
+{
+	backbuffer.DrawScrollingBackground(*this, scrollingOffset);
 }
 
 void 

@@ -14,8 +14,8 @@ Texture::Texture()
 : m_pTexture(0)
 , m_height(0)
 , m_width(0)
+, m_flip(SDL_FLIP_NONE)
 {
-	m_flip = SDL_FLIP_NONE;
 }
 
 Texture::~Texture()
@@ -38,6 +38,9 @@ Texture::Initialise(const char* pcFilename, SDL_Renderer* pRenderer)
 	}
 	else
 	{
+		// Dong: Make 'cyan' transparent in the pSurface.
+		SDL_SetColorKey(pSurface, SDL_TRUE, SDL_MapRGB(pSurface->format, 0, 0xFF, 0xFF));
+
 		m_pTexture = SDL_CreateTextureFromSurface(m_pRenderer, pSurface);
 
 		if (m_pTexture == 0)
@@ -50,7 +53,6 @@ Texture::Initialise(const char* pcFilename, SDL_Renderer* pRenderer)
 	}
 
 	SDL_SetTextureBlendMode(m_pTexture, SDL_BLENDMODE_BLEND);
-
 	SDL_QueryTexture(m_pTexture, 0, 0, &m_width, &m_height);
 
 	return (m_pTexture != 0);

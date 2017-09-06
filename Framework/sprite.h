@@ -16,7 +16,9 @@ public:
 	bool Initialise(Texture& texture);
 
 	void Process(float deltaTime);
+
 	void Draw(BackBuffer& backbuffer);
+	void DrawScrollingBackground(BackBuffer& backbuffer, int scrollingOffset);
 
 	void SetX(int x);
 	void SetY(int y);
@@ -47,14 +49,13 @@ public:
 protected:
 	Texture* m_pTexture;
 
-	// The position of the upper-left corner of the sprite
 	int m_x;
 	int m_y;
 
 	float m_angle;
 
 	int m_centerX;
-	int m_centerY;	// why need center x and center y?
+	int m_centerY;
 
 	int m_width;
 	int m_height;

@@ -43,7 +43,7 @@ AnimatedSprite::Initialise(Texture& texture)
 void
 AnimatedSprite::AddFrame(int x)
 {
-	// W03.4: Add the x coordinate to the frame coordinate container.
+	// Add the x coordinate to the frame coordinate array.
 	m_frameCoordinatesArray[m_currentFrame++] = x;
 }
 
@@ -57,22 +57,22 @@ AnimatedSprite::Process(float deltaTime)
 			m_timeElapsed += deltaTime;
 		}
 
-		// W03.4: If the time elapsed is greater than the frame speed.
+		// If the time elapsed is greater than the frame speed.
 		if (m_timeElapsed > m_frameSpeed)
 		{
-			// W03.4: Move to the next frame.
-			// W03.4: Reset the time elapsed counter.
+			// Move to the next frame.
+			// Reset the time elapsed counter.
 			m_currentFrame++;
 			m_timeElapsed = 0;
 		}
 
-		// W03.4: If the current frame is greater than the number of frame in this animation...
-		// W03.4: Reset to the first frame.
+		// If the current frame is greater than the number of frame in this animation...
+		// Reset to the first frame.
 		if (m_currentFrame > 4)
 		{
 			m_currentFrame = 0;
 
-			// W03.4: Stop the animation if it is not looping...
+			// Stop the animation if it is not looping...
 			if (!m_loop)
 			{
 				m_animating = false;
@@ -84,10 +84,8 @@ AnimatedSprite::Process(float deltaTime)
 void
 AnimatedSprite::Draw(BackBuffer& backbuffer)
 {
-	// W03.4: Draw the particular frame into the backbuffer.
+	// Draw the particular frame into the backbuffer.
 	backbuffer.DrawAnimatedSprite(*this);
-	// What is the current frame's x coordinate?
-	// What is the frame width?
 }
 
 void

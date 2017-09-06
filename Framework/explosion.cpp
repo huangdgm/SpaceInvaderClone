@@ -23,7 +23,8 @@ Explosion::Explosion()
 
 Explosion::~Explosion()
 {
-
+	delete m_pAnimatedSprite;
+	m_pAnimatedSprite = 0;
 }
 
 bool
@@ -53,9 +54,11 @@ void
 Explosion::Draw(BackBuffer& backbuffer)
 {
 	assert(m_pAnimatedSprite);
+
 	// Set the position of the animated sprite.
 	m_pAnimatedSprite->SetX(static_cast<int>(m_x));
 	m_pAnimatedSprite->SetY(static_cast<int>(m_y));
+
 	m_pAnimatedSprite->Draw(backbuffer);
 }
 

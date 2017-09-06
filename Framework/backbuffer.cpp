@@ -57,7 +57,7 @@ BackBuffer::Initialise(int width, int height)
 	}
 	else
 	{
-		m_pWindow = SDL_CreateWindow("COMP710 2D Game Framework", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+		m_pWindow = SDL_CreateWindow("Endless Darkness", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
 
 		if (m_pWindow == 0)
 		{
@@ -96,6 +96,7 @@ BackBuffer::Initialise(int width, int height)
 void 
 BackBuffer::Clear()
 {
+	// Clear screen.
 	SDL_SetRenderDrawColor(m_pRenderer, m_clearRed, m_clearGreen, m_clearBlue, 0xff);
 	SDL_RenderClear(m_pRenderer);
 }
@@ -103,6 +104,7 @@ BackBuffer::Clear()
 void
 BackBuffer::Present()
 {
+	// Update the screen.
 	SDL_RenderPresent(m_pRenderer);
 }
 
@@ -128,7 +130,7 @@ BackBuffer::DrawSprite(Sprite& sprite)
 	dest.w = sprite.GetWidth();
 	dest.h = sprite.GetHeight();
 
-	SDL_RenderCopy(m_pRenderer, sprite.GetTexture()->GetTexture(), 0, &dest);
+	SDL_RenderCopy(m_pRenderer, sprite.GetTexture()->GetTexture(), NULL, &dest);
 }
 
 void
@@ -169,6 +171,18 @@ BackBuffer::DrawLine(int x1, int y1, int x2, int y2)
 	SDL_RenderDrawLine(m_pRenderer, x1, y1, x2, y2);
 }
 
+void
+BackBuffer::DrawScrollingBackground(Sprite& sprite, int scrollingOffset)
+{
+	SDL_Rect renderQuad;
+
+	renderQuad = { 0, scrollingOffset, sprite.GetWidth(), sprite.GetHeight() };
+	SDL_RenderCopy(m_pRenderer, sprite.GetTexture()->GetTexture(), NULL, &renderQuad);
+
+	renderQuad = { 0, scrollingOffset - sprite.GetHeight(), sprite.GetWidth(), sprite.GetHeight() };
+	SDL_RenderCopy(m_pRenderer, sprite.GetTexture()->GetTexture(), NULL, &renderQuad);
+}
+
 void 
 BackBuffer::LogSDLError()
 {
@@ -203,7 +217,7 @@ BackBuffer::CreateAnimatedSprite(const char* pcFilename)
 
 	if (!pAnimatedSprite->Initialise(*pTexture))
 	{
-		LogManager::GetInstance().Log("Sprite Failed to Create!");
+		LogManager::GetInstance().Log("Animated sprite Failed to Create!");
 	}
 
 	return (pAnimatedSprite);

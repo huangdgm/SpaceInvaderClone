@@ -28,6 +28,7 @@ public:
 
 	void DrawSprite(Sprite& sprite);
 	void DrawAnimatedSprite(AnimatedSprite& animatedSprite);
+	void DrawScrollingBackground(Sprite& backgroundSprite, int scrollingOffset);
 	void DrawRectangle(int x1, int y1, int x2, int y2);
 	void DrawLine(int x1, int y1, int x2, int y2);
 
