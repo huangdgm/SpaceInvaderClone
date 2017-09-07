@@ -19,6 +19,7 @@
 #include <cstdio>
 #include <vector>
 #include <algorithm>
+#include <SDL_mixer.h>
 
 using namespace std;
 
@@ -59,77 +60,96 @@ Game::Game()
 , m_indexOfBullet(0)
 , m_indexOfExplosion(0)
 , m_indexOfAnimatedSprite(0)
-, m_scrollingOffset(0)
+, m_pEnemySprite(0)
+, m_pPlayerSprite(0)
+, m_pPlayerBulletSprite(0)
 , m_pBackgroundSprite(0)
+, m_scrollingOffset(0)
+, m_pPlayerShip(0)
+, m_pBackgroundMusic(0)
+, m_pExplosionSoundEffect(0)
+, m_pBulletSoundEffect(0)
 {
 	// Dong: Initialise all the elements in the enemy array to zero.
 	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
 		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
 		{
-			m_enemy2DArray[row][col] = 0;
+			m_enemy2DArray[row][col] = NULL;
 		}
 	}
 
 	// Dong: Initialise all the elements in the bullet array to zero.
 	for (int index = 0; index < m_maxNumOfBullets; index++)
 	{
-		m_bulletArray[index] = 0;
+		m_bulletArray[index] = NULL;
 	}
 
 	// Dong: Initialise all the elements in the explosion array to zero.
 	for (int index = 0; index < m_maxNumOfExplosions; index++)
 	{
-		m_explosionArray[index] = 0;
+		m_explosionArray[index] = NULL;
 	}
 
 	// Dong: Initialise all the elements in the animated sprit array to zero.
 	for (int index = 0; index < m_maxNumOfAnimatedSprite; index++)
 	{
-		m_AnimatedSpriteArray[index] = 0;
+		m_AnimatedSpriteArray[index] = NULL;
 	}
 }
 
 Game::~Game()
 {
 	delete m_pBackBuffer;
-	m_pBackBuffer = 0;
+	m_pBackBuffer = NULL;
 
 	delete m_pInputHandler;
-	m_pInputHandler = 0;
+	m_pInputHandler = NULL;
 
 	delete m_pPlayerShip;
-	m_pPlayerShip = 0;
+	m_pPlayerShip = NULL;
 
 	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
 		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
 		{
 			delete m_enemy2DArray[row][col];
-			m_enemy2DArray[row][col] = 0;
+			m_enemy2DArray[row][col] = NULL;
 		}
 	}
 
 	for (int index = 0; index < m_maxNumOfBullets; index++)
 	{
 		delete m_bulletArray[index];
-		m_bulletArray[index] = 0;
+		m_bulletArray[index] = NULL;
 	}
 
 	for (int index = 0; index < m_maxNumOfExplosions; index++)
 	{
 		delete m_explosionArray[index];
-		m_explosionArray[index] = 0;
+		m_explosionArray[index] = NULL;
 	}
 
 	delete m_pEnemySprite;
-	m_pEnemySprite = 0;
+	m_pEnemySprite = NULL;
 
 	delete m_pPlayerSprite;
-	m_pPlayerSprite = 0;
+	m_pPlayerSprite = NULL;
 
 	delete m_pPlayerBulletSprite;
-	m_pPlayerBulletSprite = 0;
+	m_pPlayerBulletSprite = NULL;
+
+	delete m_pBackgroundSprite;
+	m_pBackgroundSprite = NULL;
+
+	Mix_FreeMusic(m_pBackgroundMusic);
+	m_pBackgroundMusic = NULL;
+
+	Mix_FreeChunk(m_pExplosionSoundEffect);
+	m_pExplosionSoundEffect = NULL;
+
+	Mix_FreeChunk(m_pBulletSoundEffect);
+	m_pBulletSoundEffect = NULL;
 }
 
 bool
@@ -153,33 +173,35 @@ Game::Initialise()
 		return (false);
 	}
 
-	// W03.1: Load the player ship sprite.
-	// W03.1: Create the player ship instance.
-	m_pPlayerShip = new PlayerShip();
+	// Load sprite.
 	m_pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\playership.png");
-	m_pPlayerShip->Initialise(m_pPlayerSprite);	// initialise the playerShip with the sprite
-
-	// W03.2: Spawn 4 rows, each row with 14 alien enemies.
-	// W03.2: Fill the container with these new enemies.
-	// dong: Set the sprite for the enemy. All the enemies share the same sprite.
-	// dong: Set the sprite for the bullet. All the bullets share the same sprite.
-	// dong: Because all the enemies share the same sprite, so all the enemies share the same texture instance. This is true for the bullet as well.
 	m_pEnemySprite = m_pBackBuffer->CreateSprite("assets\\alienenemy.png");
 	m_pPlayerBulletSprite = m_pBackBuffer->CreateSprite("assets\\playerbullet.png");
+	m_pBackgroundSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\background.png");
 
+	// Load audio.
+	m_pBackgroundMusic = Mix_LoadMUS("assets/background.wav");;
+	m_pExplosionSoundEffect = Mix_LoadWAV("assets/explosion.wav");
+	m_pBulletSoundEffect = Mix_LoadWAV("assets/bullet.wav");
+
+	m_pPlayerShip = new PlayerShip();
+	m_pPlayerShip->Initialise(m_pPlayerSprite);
+
+	// Spawn 4 rows, each row with 14 alien enemies.
 	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
 		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
 		{
-			// dong: Create a new enemy and place it at the specified row and column.
+			// Create a new enemy and place it at the specified row and column.
 			SpawnEnemy(row, col);
 		}
 	}
 
-	m_pBackgroundSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\background.png");
-
 	m_lastTime = SDL_GetTicks();
 	m_lag = 0.0f;
+
+	// Play background music.
+	Mix_PlayMusic(m_pBackgroundMusic, -1);
 
 	return (true);
 }
@@ -233,9 +255,8 @@ Game::Process(float deltaTime)
 		m_frameCount = 0;
 	}
 
-	// Update the game world simulation:
-	// Ex003.5: Process each alien enemy in the container.
-	// Dong: Only process the enemy when this enemy is alive.
+	// Process each alien enemy in the container.
+	// Only process the enemy when this enemy is alive.
 	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
 		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
@@ -247,8 +268,8 @@ Game::Process(float deltaTime)
 		}
 	}
 
-	// W03.3: Process each bullet in the container.
-	// Dong: Only process the bullet when this bullet is alive.
+	// Process each bullet in the container.
+	// Only process the bullet when this bullet is alive.
 	for (int index = 0; index < m_maxNumOfBullets; index++)
 	{
 		if (m_bulletArray[index])
@@ -257,39 +278,66 @@ Game::Process(float deltaTime)
 		}
 	}
 
-	// W03.1: Update player...
-	m_pPlayerShip->Process(deltaTime);
+	// Update player...
+	if (m_pPlayerShip)
+	{
+		m_pPlayerShip->Process(deltaTime);
+	}
 
-	// W03.3: Check for bullet vs alien enemy collisions...
-	// W03.3: For each bullet
-	// W03.3: For each alien enemy
-	// W03.3: Check collision between two entities.
+	// Check for bullet vs alien enemy collisions...
+	// Check collision between two entities.
 	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
 	{
 		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
 		{
 			for (int index = 0; index < Game::m_maxNumOfBullets; index++)
 			{
-				if (m_bulletArray[index] != 0 && m_enemy2DArray[row][col] != 0)
+				if (m_bulletArray[index] != NULL && m_enemy2DArray[row][col] != NULL)
 				{
 					if ((*m_bulletArray[index]).IsCollidingWith(*m_enemy2DArray[row][col]))
 					{
-						SpawnExplosion(row, col);
+						float x = m_enemy2DArray[row][col]->GetPositionX();
+						float y = m_enemy2DArray[row][col]->GetPositionY();
+
+						SpawnExplosion(x, y);
 
 						// Set the value of dead enemy and dead bullet to zero.
-						m_bulletArray[index] = 0;
-						m_enemy2DArray[row][col] = 0;
+						m_bulletArray[index] = NULL;
+						m_enemy2DArray[row][col] = NULL;
 					}
 				}
 			}
 		}
 	}
 
+	// Process all the explosions that are currently explosing.
 	for (int index = 0; index < Game::m_maxNumOfExplosions; index++)
 	{
-		if (m_explosionArray[index] != 0 && m_explosionArray[index]->IsExplosing())
+		if (m_explosionArray[index] != NULL && m_explosionArray[index]->IsExplosing())
 		{
 			m_explosionArray[index]->Process(deltaTime);
+		}
+	}
+
+	// Check for playership vs allien enemies collision.
+	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
+	{
+		for (int col = 0; col < Game::m_numOfEnemyCols; col++)
+		{
+			if (m_enemy2DArray[row][col] != NULL && m_pPlayerShip != NULL)
+			{
+				if ((*m_pPlayerShip).IsCollidingWith(*m_enemy2DArray[row][col]))
+				{
+					float x = m_enemy2DArray[row][col]->GetPositionX();
+					float y = m_enemy2DArray[row][col]->GetPositionY();
+
+					SpawnExplosion(x, y);
+
+					// Set the value of dead enemy and dead bullet to zero.
+					m_pPlayerShip = NULL;
+					m_enemy2DArray[row][col] = NULL;
+				}
+			}
 		}
 	}
 
@@ -311,8 +359,11 @@ Game::Draw(BackBuffer& backBuffer)
 	{
 		m_scrollingOffset = 0;
 	}
-	
-	m_pBackgroundSprite->DrawScrollingBackground(backBuffer, m_scrollingOffset / 60);
+
+	if (m_pBackgroundSprite)
+	{
+		m_pBackgroundSprite->DrawScrollingBackground(backBuffer, m_scrollingOffset / 60);
+	}
 
 	// Draw all enemy aliens in container...
 	for (int row = 0; row < Game::m_numOfEnemyRows; row++)
@@ -338,17 +389,21 @@ Game::Draw(BackBuffer& backBuffer)
 	}
 
 	// W03.1: Draw the player ship...
-	m_pPlayerShip->Draw(backBuffer);
+	if (m_pPlayerShip)
+	{
+		m_pPlayerShip->Draw(backBuffer);
+	}
 
 	// Dong: Draw the explosion only if the explosion is ongoing.
 	for (int index = 0; index < Game::m_maxNumOfExplosions; index++)
 	{
-		if (m_explosionArray[index] != 0 && m_explosionArray[index]->IsExplosing())
+		if (m_explosionArray[index] != NULL && m_explosionArray[index]->IsExplosing())
 		{
 			m_explosionArray[index]->Draw(backBuffer);
 		}
 	}
 
+	// Update the screen.
 	backBuffer.Present();
 }
 
@@ -361,45 +416,67 @@ Game::Quit()
 void
 Game::StopSpaceShip()
 {
-	// Stop the spaceship once the dpad released.
-	m_pPlayerShip->SetHorizontalVelocity(0);
+	if (m_pPlayerShip)
+	{
+		m_pPlayerShip->SetHorizontalVelocity(0);
+		m_pPlayerShip->SetVerticalVelocity(0);
+	}
 }
 
 void
 Game::MoveSpaceShipLeft()
 {
-	// W03.1: Tell the player ship to move left.
-	m_pPlayerShip->SetHorizontalVelocity(Game::m_velocityOfPlayerShip * (-1.0f));
+	if (m_pPlayerShip)
+	{
+		m_pPlayerShip->SetHorizontalVelocity(Game::m_velocityOfPlayerShip * (-1.0f));
+	}
 }
 
-// W03.1: Add the method to tell the player ship to move right...
 void
 Game::MoveSpaceShipRight()
 {
-	// Tell the player ship to move right.
-	m_pPlayerShip->SetHorizontalVelocity(Game::m_velocityOfPlayerShip * 1.0f);
+	if (m_pPlayerShip)
+	{
+		m_pPlayerShip->SetHorizontalVelocity(Game::m_velocityOfPlayerShip * 1.0f);
+	}
 }
 
-// W03.3: Space a Bullet in game.
+void
+Game::MoveSpaceShipUp()
+{
+	if (m_pPlayerShip)
+	{
+		m_pPlayerShip->SetVerticalVelocity(Game::m_velocityOfPlayerShip * (-1.0f));
+	}
+}
+
+void
+Game::MoveSpaceShipDown()
+{
+	if (m_pPlayerShip)
+	{
+		m_pPlayerShip->SetVerticalVelocity(Game::m_velocityOfPlayerShip * (1.0f));
+	}
+}
+
 void
 Game::FireSpaceShipBullet()
 {
-	// W03.3: Create a new bullet object.
 	Bullet* bullet = new Bullet();
 
-	// Initialise the initial position and the sprite of the bullet.
 	bullet->Initialise(m_pPlayerBulletSprite);
 
+	assert(m_pPlayerShip);
+
 	float positionX = (m_pPlayerShip->GetPositionX() + (m_pPlayerSprite->GetWidth() - m_pPlayerBulletSprite->GetWidth()) / 2) * 1.0f;
-	float positionY = (Game::m_heightOfWindow - m_pPlayerSprite->GetHeight() - m_pPlayerBulletSprite->GetHeight()) * 1.0f;
-	
+	float positionY = (m_pPlayerShip->GetPositionY() - m_pPlayerBulletSprite->GetHeight()) * 1.0f;
+
 	bullet->SetPositionX(positionX);
 	bullet->SetPositionY(positionY);
 
-	// W03.3: Set the bullets vertical velocity.
 	bullet->SetVerticalVelocity(Game::m_velocityOfBullet * 1.0f);
 
-	// W03.3: Add the new bullet to the bullet container.
+	// Add the new bullet to the bullet container.
 	if (m_indexOfBullet < m_maxNumOfBullets)
 	{
 		m_bulletArray[m_indexOfBullet] = bullet;
@@ -409,25 +486,27 @@ Game::FireSpaceShipBullet()
 	{
 		m_indexOfBullet = 0;
 	}
+
+	// Play the bullet sound effect.
+	Mix_PlayChannel(-1, m_pBulletSoundEffect, 0);
 }
 
-// W03.2: Spawn a Enemy in game.
 void
 Game::SpawnEnemy(int row, int col)
 {
-	// W03.2: Create a new Enemy object.
 	Enemy* enemy = new Enemy();
 
-	// W03.2: Load the alien enemy sprite file.
 	enemy->Initialise(m_pEnemySprite);
 	enemy->SetPosition(59.0f*col, 59.0f*row);
 
-	// W03.2: Add the new Enemy to the enemy container.
+	// To make the enemies to move towards the bottom of the screen.
+	enemy->SetVerticalVelocity(10);
+
 	m_enemy2DArray[row][col] = enemy;
 }
 
 void
-Game::SpawnExplosion(int row, int col)
+Game::SpawnExplosion(float x, float y)
 {
 	Explosion* explosion = new Explosion();
 
@@ -437,11 +516,14 @@ Game::SpawnExplosion(int row, int col)
 	m_AnimatedSpriteArray[m_indexOfAnimatedSprite++] = m_pAnimatedSprite;
 
 	explosion->Initialise(m_pAnimatedSprite);
-	explosion->SetPositionX(59.0f*col);
-	explosion->SetPositionY(59.0f*row);
+	explosion->SetPositionX(x);
+	explosion->SetPositionY(y);
 
 	if (m_indexOfExplosion < m_maxNumOfExplosions)
 	{
 		m_explosionArray[m_indexOfExplosion++] = explosion;
 	}
+
+	// Play the explosion sound effect.
+	Mix_PlayChannel(-1, m_pExplosionSoundEffect, 0);
 }

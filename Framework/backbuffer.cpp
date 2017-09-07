@@ -15,6 +15,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <cassert>
+#include <SDL_mixer.h>
 
 BackBuffer::BackBuffer()
 : m_pTextureManager(0)
@@ -42,6 +43,7 @@ BackBuffer::~BackBuffer()
 
 	IMG_Quit();
 	SDL_Quit();
+	Mix_Quit();
 }
 
 bool 
@@ -50,7 +52,8 @@ BackBuffer::Initialise(int width, int height)
 	m_width = width;
 	m_height = height;
 
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0)
+	// The SDL_INIT_AUDIO is added to support the audio function.
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO) < 0)
 	{
 		LogSDLError();
 		return (false);
@@ -81,6 +84,15 @@ BackBuffer::Initialise(int width, int height)
 				{
 					LogSDLError();
 					return (false);
+				}
+				else
+				{
+					// Initialize SDL_mixer
+					if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+					{
+						LogSDLError();
+						return (false);
+					}
 				}
 			}
 		}

@@ -99,6 +99,14 @@ InputHandler::ProcessInput(Game& game)
 			{
 				game.MoveSpaceShipLeft();
 			}
+			else if (e.key.keysym.sym == SDLK_UP)
+			{
+				game.MoveSpaceShipUp();
+			}
+			else if (e.key.keysym.sym == SDLK_DOWN)
+			{
+				game.MoveSpaceShipDown();
+			}
 			else if (e.key.keysym.sym == SDLK_SPACE)
 			{
 				game.FireSpaceShipBullet();

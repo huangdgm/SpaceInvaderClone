@@ -25,7 +25,7 @@ PlayerShip::PlayerShip()
 
 PlayerShip::~PlayerShip()
 {
-
+	Entity::~Entity();
 }
 
 void
@@ -43,14 +43,9 @@ PlayerShip::Initialise(Sprite* sprite)
 void
 PlayerShip::Process(float deltaTime)
 {
-	// Ensure the process method chains-up to the super class process method.
 	Entity::Process(deltaTime);
 
-	// W03.1: Generic position update, based upon velocity (and time).
-	// Dong: No need to update the position of the playership. Because the super class process method has done that.
-
-	// W03.1: Boundary checking and position capping.
-	// dong: Only need to check the boundary horizontally. No need to check the vertical boundary.
+	// Horizontal boundary checking and position capping.
 	if (m_x <= 0)
 	{
 		m_x = 0;
@@ -58,5 +53,15 @@ PlayerShip::Process(float deltaTime)
 	else if (m_x >= Game::m_widthOfWindow - m_pSprite->GetWidth())
 	{
 		m_x = (Game::m_widthOfWindow - m_pSprite->GetWidth()) * 1.0f;
+	}
+
+	// Vertical boundary checking and position capping.
+	if (m_y <= 0)
+	{
+		m_y = 0;
+	}
+	else if (m_y >= Game::m_heightOfWindow - m_pSprite->GetHeight())
+	{
+		m_y = (Game::m_heightOfWindow - m_pSprite->GetHeight()) * 1.0f;
 	}
 }

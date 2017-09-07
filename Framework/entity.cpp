@@ -28,7 +28,7 @@ Entity::~Entity()
 }
 
 bool
-Entity::Initialise(Sprite* sprite)	// Why Sprite*, not Sprite&
+Entity::Initialise(Sprite* sprite)
 {
 	assert(sprite);
 	m_pSprite = sprite;
@@ -71,24 +71,18 @@ Entity::IsCollidingWith(Entity& e)
 	double distance = 0.0;
 	bool isCollid = false;
 
-	// W03.3: Generic Entity Collision routine.
-
-	// W03.3: Does this object collide with the e object?
-	// W03.3: Create a circle for each entity (this and e).
-	double radiusOfEnemy = sqrt(32 * 32 + 32 * 32) / 2;
-	double radiusOfBullet = sqrt(16 * 16 + 16 * 16) / 2;
+	double radiusOfThis = sqrt(pow(this->m_pSprite->GetHeight(), 2)) / 2;
+	double radiusOfE = sqrt(pow(e.m_pSprite->GetHeight(), 2) * 2) / 2;
 	
 	distance = sqrt(pow((e.GetPositionX() - this->GetPositionX()), 2) + pow((e.GetPositionY() - this->GetPositionY()), 2));
 
-	// W03.3: Check for intersection.
-	// W03.3: Using circle-vs-circle collision detection.
-	if (distance <= radiusOfBullet + radiusOfEnemy)
+	// Check for intersection.
+	if (distance <= radiusOfThis + radiusOfE)
 	{
 		isCollid = true;
 	}
 
-	// W03.3: Return result of collision.
-	return isCollid; // W03.4 Change return value!
+	return isCollid;
 }
 
 void 

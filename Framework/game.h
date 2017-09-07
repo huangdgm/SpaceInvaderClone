@@ -9,6 +9,8 @@
 #include "explosion.h"
 #include "texture.h"
 
+#include <SDL_mixer.h>
+
 // Forward Declarations
 class BackBuffer;
 class InputHandler;
@@ -32,10 +34,12 @@ public:
 	void StopSpaceShip();
 	void MoveSpaceShipLeft();
 	void MoveSpaceShipRight();
+	void MoveSpaceShipUp();
+	void MoveSpaceShipDown();
 	void FireSpaceShipBullet();
 
 	void SpawnEnemy(int x, int y);
-	void SpawnExplosion(int x, int y);
+	void SpawnExplosion(float x, float y);
 	
 protected:
 	void Process(float deltaTime);
@@ -90,14 +94,21 @@ protected:
 	const static int m_maxNumOfExplosions = 56;
 	const static int m_maxNumOfAnimatedSprite = 56;
 
-	const static int m_velocityOfBullet = -300;
-	const static int m_velocityOfPlayerShip = 200;
+	const static int m_velocityOfBullet = -800;
+	const static int m_velocityOfPlayerShip = 400;
 
 	int m_indexOfBullet;
 	int m_indexOfExplosion;
 	int m_indexOfAnimatedSprite;
 
 	int m_scrollingOffset;
+
+	// Background music.
+	Mix_Music* m_pBackgroundMusic;
+
+	// The sound effects.
+	Mix_Chunk* m_pExplosionSoundEffect;
+	Mix_Chunk* m_pBulletSoundEffect;
 
 private:
 

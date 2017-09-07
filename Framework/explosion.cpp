@@ -24,7 +24,7 @@ Explosion::Explosion()
 Explosion::~Explosion()
 {
 	delete m_pAnimatedSprite;
-	m_pAnimatedSprite = 0;
+	m_pAnimatedSprite = NULL;
 }
 
 bool
