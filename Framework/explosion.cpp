@@ -17,6 +17,7 @@ Explosion::Explosion()
 : m_pAnimatedSprite(0)
 , m_x(0.0f)
 , m_y(0.0f)
+, m_dead(true)
 {
 
 }
@@ -40,6 +41,7 @@ Explosion::Initialise(AnimatedSprite* animatedSprite)
 	m_pAnimatedSprite->AddFrame(256);
 
 	m_pAnimatedSprite->ResetCurrentFrame();
+	m_dead = false;
 
 	return true;
 }
@@ -90,4 +92,16 @@ bool
 Explosion::IsExplosing() const
 {
 	return (m_pAnimatedSprite->IsAnimating());
+}
+
+bool
+Explosion::IsDead() const
+{
+	return m_dead;
+}
+
+void
+Explosion::SetDead(bool dead)
+{
+	m_dead = dead;
 }

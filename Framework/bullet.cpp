@@ -25,6 +25,16 @@ Bullet::~Bullet()
 
 }
 
+bool
+Bullet::Initialise(Sprite* sprite)
+{
+	Entity::Initialise(sprite);
+
+	m_dead = false;
+
+	return true;
+}
+
 void
 Bullet::Process(float deltaTime)
 {

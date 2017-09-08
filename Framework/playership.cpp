@@ -25,7 +25,7 @@ PlayerShip::PlayerShip()
 
 PlayerShip::~PlayerShip()
 {
-	Entity::~Entity();
+
 }
 
 void

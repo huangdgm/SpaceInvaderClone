@@ -80,26 +80,24 @@ protected:
 	Sprite* m_pPlayerBulletSprite;
 	Sprite* m_pBackgroundSprite;
 
-	AnimatedSprite* m_AnimatedSpriteArray[56];
 
 	PlayerShip* m_pPlayerShip;
-	Enemy* m_enemy2DArray[4][14];
-	Bullet* m_bulletArray[30];
-	Explosion* m_explosionArray[56];
+	Enemy* m_pEnemy;
+	Bullet* m_pBullet;
+	Explosion* m_pExplosion;
 
-	const static int m_numOfEnemyRows = 4;
-	const static int m_numOfEnemyCols = 14;
+	const static int NUM_OF_ENEMY_COLS = 14;
 
-	const static int m_maxNumOfBullets = 30;
-	const static int m_maxNumOfExplosions = 56;
-	const static int m_maxNumOfAnimatedSprite = 56;
+	const static int MAX_NUM_OF_BULLETS = 30;
+	const static int MAX_NUM_OF_EXPLOSIONS = 56;
+	const static int MAX_NUM_OF_ANIMATEDSPRITE = 56;
 
-	const static int m_velocityOfBullet = -800;
-	const static int m_velocityOfPlayerShip = 400;
+	const static int VELOCITY_OF_BULLET = -800;
+	const static int VELOCITY_OF_PLAYERSHIP = 400;
 
 	int m_indexOfBullet;
+	int m_indexOfEnemy;
 	int m_indexOfExplosion;
-	int m_indexOfAnimatedSprite;
 
 	int m_scrollingOffset;
 

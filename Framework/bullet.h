@@ -11,6 +11,7 @@ public:
 	Bullet();
 	~Bullet();
 
+	bool Initialise(Sprite* sprite);
 	void Process(float deltaTime);
 
 protected:

@@ -20,7 +20,7 @@ AnimatedSprite::AnimatedSprite()
 
 AnimatedSprite::~AnimatedSprite()
 {
-	Sprite::~Sprite();
+
 }
 
 bool

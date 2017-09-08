@@ -17,7 +17,7 @@ Entity::Entity()
 , m_y(0.0f)
 , m_velocityX(0.0f)
 , m_velocityY(0.0f)
-, m_dead(false)
+, m_dead(true)
 {
 
 }
@@ -31,6 +31,7 @@ bool
 Entity::Initialise(Sprite* sprite)
 {
 	assert(sprite);
+
 	m_pSprite = sprite;
 
 	return (true);	// If the initilisation is successful, return true, otherwise, assert will stop the executing of the program.
@@ -60,8 +61,10 @@ void
 Entity::Draw(BackBuffer& backBuffer)
 {
 	assert(m_pSprite);
+
 	m_pSprite->SetX(static_cast<int>(m_x));
 	m_pSprite->SetY(static_cast<int>(m_y));
+
 	m_pSprite->Draw(backBuffer);
 }
 

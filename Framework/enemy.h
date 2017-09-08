@@ -11,6 +11,7 @@ public:
 	Enemy();
 	~Enemy();
 
+	bool Initialise(Sprite* sprite);
 	void Process(float deltaTime);
 
 protected:

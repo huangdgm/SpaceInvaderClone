@@ -23,6 +23,16 @@ Enemy::~Enemy()
 
 }
 
+bool
+Enemy::Initialise(Sprite* sprite)
+{
+	Entity::Initialise(sprite);
+
+	m_dead = false;
+
+	return true;
+}
+
 void
 Enemy::Process(float deltaTime)
 {
