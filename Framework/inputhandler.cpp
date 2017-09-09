@@ -31,6 +31,11 @@ InputHandler::~InputHandler()
 bool
 InputHandler::Initialise()
 {
+	if (SDL_Init(SDL_INIT_JOYSTICK) < 0)
+	{
+		LogManager::GetInstance().Log("Joystick could not initialize!");
+	}
+
 	int numController = SDL_NumJoysticks();
 
 	// Give warning if no joysticks connected.
@@ -52,9 +57,6 @@ InputHandler::Initialise()
 void
 InputHandler::ProcessInput(Game& game)
 {
-	// W03.1: Receive Input Events below...
-	SDL_InitSubSystem(SDL_INIT_JOYSTICK);	// initialise subsystem
-
 	SDL_Event e;
 
 	// Loop until there are no events left in the event queue.
@@ -68,7 +70,7 @@ InputHandler::ProcessInput(Game& game)
 
 			break;
 		case SDL_JOYBUTTONDOWN:
-			// W03.3: Tell the game to fire a player bullet...
+			// Tell the game to fire a player bullet...
 			if (e.jbutton.button == SDL_CONTROLLER_BUTTON_A)
 			{
 				game.FireSpaceShipBullet();
@@ -76,13 +78,21 @@ InputHandler::ProcessInput(Game& game)
 
 			break;
 		case SDL_JOYHATMOTION:
-			if (e.jhat.value == 8)
+			if (e.jhat.value == SDL_HAT_LEFT)
 			{
 				game.MoveSpaceShipLeft();
 			}
-			else if (e.jhat.value == 2)
+			else if (e.jhat.value == SDL_HAT_RIGHT)
 			{
 				game.MoveSpaceShipRight();
+			}
+			else if (e.jhat.value == SDL_HAT_UP)
+			{
+				game.MoveSpaceShipUp();
+			}
+			else if (e.jhat.value == SDL_HAT_DOWN)
+			{
+				game.MoveSpaceShipDown();
 			}
 			else if (e.jhat.value == SDL_HAT_CENTERED)
 			{

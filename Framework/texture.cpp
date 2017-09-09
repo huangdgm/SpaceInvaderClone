@@ -21,7 +21,7 @@ Texture::Texture()
 Texture::~Texture()
 {
 	SDL_DestroyTexture(m_pTexture);
-	m_pTexture = 0;
+	m_pTexture = NULL;
 }
 
 bool 

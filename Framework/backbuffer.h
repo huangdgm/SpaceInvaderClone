@@ -34,6 +34,8 @@ public:
 
 	Sprite* CreateSprite(const char* pcFilename);
 	AnimatedSprite* CreateAnimatedSprite(const char* pcFilename);
+
+	SDL_Renderer* GetRenderer();
 	
 protected:
 	void LogSDLError();

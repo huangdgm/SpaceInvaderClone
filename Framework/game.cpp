@@ -12,6 +12,8 @@
 #include "bullet.h"
 #include "enemy.h"
 #include "explosion.h"
+#include "infopanel.h"
+#include "texttexture.h"
 
 // Library includes:
 #include <cassert>
@@ -64,6 +66,7 @@ Game::Game()
 , m_pPlayerSprite(0)
 , m_pPlayerBulletSprite(0)
 , m_pBackgroundSprite(0)
+, m_pInfoPanelSprite(0)
 , m_scrollingOffset(0)
 , m_pPlayerShip(0)
 , m_pBackgroundMusic(0)
@@ -72,6 +75,9 @@ Game::Game()
 , m_pEnemy(new Enemy[NUM_OF_ENEMY_COLS])
 , m_pBullet(new Bullet[MAX_NUM_OF_BULLETS])
 , m_pExplosion(new Explosion[MAX_NUM_OF_EXPLOSIONS])
+, m_pFont(0)
+, m_pTextTexture(0)
+, m_pFontColor(0)
 {
 
 }
@@ -87,6 +93,9 @@ Game::~Game()
 	delete m_pPlayerShip;
 	m_pPlayerShip = NULL;
 
+	delete m_pInfoPanel;
+	m_pInfoPanel = NULL;
+
 	delete m_pEnemySprite;
 	m_pEnemySprite = NULL;
 
@@ -98,6 +107,9 @@ Game::~Game()
 
 	delete m_pBackgroundSprite;
 	m_pBackgroundSprite = NULL;
+
+	delete m_pInfoPanelSprite;
+	m_pInfoPanelSprite = NULL;
 
 	delete[] m_pEnemy;
 	m_pEnemy = NULL;
@@ -116,54 +128,67 @@ Game::~Game()
 
 	Mix_FreeChunk(m_pBulletSoundEffect);
 	m_pBulletSoundEffect = NULL;
+
+	TTF_CloseFont(m_pFont);
+	m_pFont = NULL;
+
+	delete m_pTextTexture;
+	m_pTextTexture = NULL;
+
+	delete m_pFontColor;
+	m_pFontColor = NULL;
 }
 
 bool
 Game::Initialise()
 {
-	// Dong: Create the back buffer
-	m_pBackBuffer = new BackBuffer();
+	// Create the back buffer.
+	CreateBackBuffer();
 
-	if (!m_pBackBuffer->Initialise(Game::m_widthOfWindow, Game::m_heightOfWindow))
-	{
-		LogManager::GetInstance().Log("BackBuffer Init Fail!");
-		return (false);
-	}
+	// Create the input handler.
+	CreateInputHandler();
 
-	// Dong: Create the input handler.
-	m_pInputHandler = new InputHandler();
+	// Create the TTF font.
+	CreateTTFFont();
 
-	if (!m_pInputHandler->Initialise())
-	{
-		LogManager::GetInstance().Log("InputHandler Init Fail!");
-		return (false);
-	}
+	// Create the font color.
+	CreateFontColor(0, 0, 0);
 
 	// Load sprite.
 	m_pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\playership.png");
 	m_pEnemySprite = m_pBackBuffer->CreateSprite("assets\\alienenemy.png");
 	m_pPlayerBulletSprite = m_pBackBuffer->CreateSprite("assets\\playerbullet.png");
 	m_pBackgroundSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\background.png");
+	m_pInfoPanelSprite = m_pBackBuffer->CreateSprite("assets\\infopanel.png");
 
 	// Load audio.
-	m_pBackgroundMusic = Mix_LoadMUS("assets/background.wav");;
-	m_pExplosionSoundEffect = Mix_LoadWAV("assets/explosion.wav");
-	m_pBulletSoundEffect = Mix_LoadWAV("assets/bullet.wav");
+	m_pBackgroundMusic = Mix_LoadMUS("assets\\background.wav");;
+	m_pExplosionSoundEffect = Mix_LoadWAV("assets\\explosion.wav");
+	m_pBulletSoundEffect = Mix_LoadWAV("assets\\bullet.wav");
 
+	// Create the player ship.
 	m_pPlayerShip = new PlayerShip();
 	m_pPlayerShip->Initialise(m_pPlayerSprite);
-	m_pPlayerShip->SetDead(false);
 
+	// Create the enemies.
 	for (int i = 0; i < NUM_OF_ENEMY_COLS; i++)
 	{
 		SpawnEnemy(0, i);
 	}
+
+	// Create the info panel.
+	m_pInfoPanel = new InfoPanel();
+	m_pInfoPanel->Initialise(m_pInfoPanelSprite);
 
 	m_lastTime = SDL_GetTicks();
 	m_lag = 0.0f;
 
 	// Play background music.
 	Mix_PlayMusic(m_pBackgroundMusic, -1);
+
+	// Create the text texture.
+	m_pTextTexture = new TextTexture();
+	m_pTextTexture->Initialise(m_pFont, m_pBackBuffer->GetRenderer());
 
 	return (true);
 }
@@ -217,6 +242,7 @@ Game::Process(float deltaTime)
 		m_frameCount = 0;
 	}
 
+	// Process the enemies.
 	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + NUM_OF_ENEMY_COLS; enemy++)
 	{
 		if (!(enemy->IsDead()))
@@ -225,6 +251,7 @@ Game::Process(float deltaTime)
 		}
 	}
 
+	// Process the bullets.
 	for (Bullet* bullet = m_pBullet; bullet < m_pBullet + MAX_NUM_OF_BULLETS; bullet++)
 	{
 		if (!(bullet->IsDead()))
@@ -233,12 +260,14 @@ Game::Process(float deltaTime)
 		}
 	}
 
-	// Update player...
+	// Process the player.
 	if (m_pPlayerShip)
 	{
 		m_pPlayerShip->Process(deltaTime);
 	}
 
+	// Check for the collisions between the enemies and the bullets.
+	// If collisions detected, spawn the explosions.
 	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + NUM_OF_ENEMY_COLS; enemy++)
 	{
 		for (Bullet* bullet = m_pBullet; bullet < m_pBullet + MAX_NUM_OF_BULLETS; bullet++)
@@ -251,6 +280,7 @@ Game::Process(float deltaTime)
 					float y = enemy->GetPositionY();
 
 					SpawnExplosion(x, y);
+					m_pPlayerShip->SetScore(m_pPlayerShip->GetScore() + 10);
 
 					enemy->SetDead(true);
 					bullet->SetDead(true);
@@ -259,6 +289,7 @@ Game::Process(float deltaTime)
 		}
 	}
 
+	// Process the explosions.
 	for (Explosion* explosion = m_pExplosion; explosion < m_pExplosion + MAX_NUM_OF_EXPLOSIONS; explosion++)
 	{
 		if (!(explosion->IsDead()) && explosion->IsExplosing())
@@ -267,6 +298,8 @@ Game::Process(float deltaTime)
 		}
 	}
 
+	// Check for the collisions between the enemies and the player ship.
+	// If collision detected, spawn the explosion.
 	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + NUM_OF_ENEMY_COLS; enemy++)
 	{
 		if (!(enemy->IsDead()) && !(m_pPlayerShip->IsDead()))
@@ -283,6 +316,9 @@ Game::Process(float deltaTime)
 			}
 		}
 	}
+
+	// Process the text texture.
+	m_pTextTexture->LoadFromRenderedText(to_string(m_pPlayerShip->GetScore()), *m_pFontColor);
 
 	// W03.3: Remove any dead explosions from the container...
 }
@@ -308,6 +344,13 @@ Game::Draw(BackBuffer& backBuffer)
 		m_pBackgroundSprite->DrawScrollingBackground(backBuffer, m_scrollingOffset / 60);
 	}
 
+	// Draw the info panel
+	if (!(m_pInfoPanel->IsDead()))
+	{
+		m_pInfoPanel->Draw(backBuffer);
+	}
+
+	// Draw the enemies.
 	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + NUM_OF_ENEMY_COLS; enemy++)
 	{
 		if (!(enemy->IsDead()))
@@ -316,6 +359,7 @@ Game::Draw(BackBuffer& backBuffer)
 		}
 	}
 
+	// Draw the bullets.
 	for (Bullet* bullet = m_pBullet; bullet < m_pBullet + MAX_NUM_OF_BULLETS; bullet++)
 	{
 		if (!(bullet->IsDead()))
@@ -324,12 +368,13 @@ Game::Draw(BackBuffer& backBuffer)
 		}
 	}
 
-	// W03.1: Draw the player ship...
+	// Draw the player ship.
 	if (!(m_pPlayerShip->IsDead()))
 	{
 		m_pPlayerShip->Draw(backBuffer);
 	}
 
+	// Draw the explosions.
 	for (Explosion* explosion = m_pExplosion; explosion < m_pExplosion + MAX_NUM_OF_EXPLOSIONS; explosion++)
 	{
 		if (!(explosion->IsDead()) && explosion->IsExplosing())
@@ -337,6 +382,9 @@ Game::Draw(BackBuffer& backBuffer)
 			explosion->Draw(backBuffer);
 		}
 	}
+
+	// Draw the text texture.
+	m_pTextTexture->Render(620, 100);
 
 	// Update the screen.
 	backBuffer.Present();
@@ -441,7 +489,7 @@ Game::SpawnEnemy(int row, int col)
 	enemy->SetPosition(59.0f*col, 59.0f*row);
 
 	// To make the enemies to move towards the bottom of the screen.
-	enemy->SetVerticalVelocity(10);
+	enemy->SetVerticalVelocity(50);
 }
 
 void
@@ -461,4 +509,66 @@ Game::SpawnExplosion(float x, float y)
 
 	// Play the explosion sound effect.
 	Mix_PlayChannel(-1, m_pExplosionSoundEffect, 0);
+}
+
+bool
+Game::CreateBackBuffer()
+{
+	m_pBackBuffer = new BackBuffer();
+
+	if (!m_pBackBuffer->Initialise(WIDTH_OF_WINDOW, HEIGHT_OF_WINDOW))
+	{
+		LogManager::GetInstance().Log("BackBuffer Init Fail!");
+		return (false);
+	}
+
+	return (true);
+}
+
+bool
+Game::CreateInputHandler()
+{
+	m_pInputHandler = new InputHandler();
+
+	if (!m_pInputHandler->Initialise())
+	{
+		LogManager::GetInstance().Log("InputHandler Init Fail!");
+		return (false);
+	}
+
+	return (true);
+}
+
+bool
+Game::CreateTTFFont()
+{
+	m_pFont = TTF_OpenFont("assets\\stencil.ttf", 28);
+
+	if (m_pFont == NULL)
+	{
+		LogManager::GetInstance().Log("Failed to load font!");
+		return (false);
+	}
+
+	return (true);
+}
+
+bool
+Game::CreateFontColor(Uint8 r, Uint8 g, Uint8 b)
+{
+	m_pFontColor = new SDL_Color();
+
+	if (m_pFontColor == NULL)
+	{
+		LogManager::GetInstance().Log("Failed to create font color!");
+		return (false);
+	}
+	else
+	{
+		m_pFontColor->r = r;
+		m_pFontColor->g = g;
+		m_pFontColor->b = b;
+	}
+
+	return (true);
 }

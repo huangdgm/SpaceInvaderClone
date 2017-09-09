@@ -63,6 +63,12 @@
     <ClInclude Include="particleemitter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="infopanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="texttexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="backbuffer.cpp">
@@ -114,6 +120,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vector2d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="infopanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="texttexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

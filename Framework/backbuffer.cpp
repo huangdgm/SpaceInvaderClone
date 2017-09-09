@@ -16,6 +16,7 @@
 #include <SDL_image.h>
 #include <cassert>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 
 BackBuffer::BackBuffer()
 : m_pTextureManager(0)
@@ -53,7 +54,7 @@ BackBuffer::Initialise(int width, int height)
 	m_height = height;
 
 	// The SDL_INIT_AUDIO is added to support the audio function.
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	{
 		LogSDLError();
 		return (false);
@@ -92,6 +93,14 @@ BackBuffer::Initialise(int width, int height)
 					{
 						LogSDLError();
 						return (false);
+					}
+					else
+					{
+						if (TTF_Init() == -1)
+						{
+							LogSDLError();
+							return (false);
+						}
 					}
 				}
 			}
@@ -153,13 +162,13 @@ BackBuffer::DrawAnimatedSprite(AnimatedSprite& animatedSprite)
 
 	src.x = animatedSprite.GetFrameCoordinate(animatedSprite.GetCurrentFrame());
 	src.y = 0;
-	src.w = Game::m_widthOfAnimatedSpriteFrame;
-	src.h = Game::m_heigthOfAnimatedSpriteFrame;
+	src.w = Game::WIDTH_OF_ANIMATED_SPRITE_FRAME;
+	src.h = Game::HEIGHT_OF_ANIMATED_SPRITE_FRAME;
 
 	dest.x = animatedSprite.GetX();
 	dest.y = animatedSprite.GetY();
-	dest.w = Game::m_widthOfAnimatedSpriteFrame;
-	dest.h = Game::m_heigthOfAnimatedSpriteFrame;
+	dest.w = Game::WIDTH_OF_ANIMATED_SPRITE_FRAME;
+	dest.h = Game::HEIGHT_OF_ANIMATED_SPRITE_FRAME;
 
 	SDL_RenderCopy(m_pRenderer, animatedSprite.GetTexture()->GetTexture(), &src, &dest);
 }
@@ -241,4 +250,10 @@ BackBuffer::SetClearColour(unsigned char r, unsigned char g, unsigned char b)
 	m_clearRed = r;
 	m_clearGreen = g;
 	m_clearBlue = b;
+}
+
+SDL_Renderer*
+BackBuffer::GetRenderer()
+{
+	return m_pRenderer;
 }

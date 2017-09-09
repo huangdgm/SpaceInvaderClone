@@ -14,6 +14,14 @@ public:
 	void Process(float deltaTime);
 	void Initialise(Sprite* sprite);
 
+	void SetScore(int score);
+	void SetHealth(int health);
+	void SetNumOfLivesLeft(int numOfLivesLeft);
+
+	int GetScore() const;
+	int GetHealth() const;
+	int GetNumOfLivesLeft() const;
+
 protected:
 
 private:
@@ -22,6 +30,9 @@ private:
 
 	//Member Data:
 public:
+	int m_score;
+	int m_health;
+	int m_numOfLivesLeft;
 
 protected:
 

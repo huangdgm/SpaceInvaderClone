@@ -40,21 +40,21 @@ Entity::Initialise(Sprite* sprite)
 void
 Entity::Process(float deltaTime)
 {
-	// W03.1: Generic position update, based upon velocity (and time).
+	// Generic position update, based upon velocity (and time).
 	m_x += m_velocityX * deltaTime;
 	m_y += m_velocityY * deltaTime;
 
-	// W03.1: Boundary checking and position capping.
-	// dong: General boundary check. Subclasses may need to modify the boundary accordingly.
+	// Boundary checking and position capping.
+	// General boundary check. Subclasses may need to modify the boundary accordingly.
 	// dong: Here, only horizontal boundary check is performed.
-	if (m_x <= 0)
-	{
-		m_x = 0;
-	}
-	else if (m_x >= 800)
-	{
-		m_x = 800;
-	}
+	//if (m_x <= 0)
+	//{
+	//	m_x = 0;
+	//}
+	//else if (m_x >= 800)
+	//{
+	//	m_x = 800;
+	//}
 }
 
 void 

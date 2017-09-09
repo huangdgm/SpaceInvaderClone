@@ -13,7 +13,6 @@
 #include <XInput.h>
 #include <iostream>
 
-// Ensure the constructor chains-up to the super class constructor.
 Bullet::Bullet()
 : Entity()
 {
