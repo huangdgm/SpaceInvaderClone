@@ -17,16 +17,13 @@
 // Ensure the constructor chains-up to the super class constructor.
 InfoPanel::InfoPanel()
 : Entity()
-//, m_pFont(0)
-//, m_pTexture(0)
 {
 
 }
 
 InfoPanel::~InfoPanel()
 {
-	//delete m_pFont;
-	//m_pFont = NULL;
+
 }
 
 bool

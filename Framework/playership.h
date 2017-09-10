@@ -2,7 +2,9 @@
 #ifndef __PLAYERSHIP_H__
 #define __PLAYERSHIP_H__
 
+// Local includes:
 #include "entity.h"
+#include "weapontype.h"
 
 class PlayerShip : public Entity
 {
@@ -14,13 +16,10 @@ public:
 	void Process(float deltaTime);
 	void Initialise(Sprite* sprite);
 
-	void SetScore(int score);
 	void SetHealth(int health);
 	void SetNumOfLivesLeft(int numOfLivesLeft);
 
-	int GetScore() const;
 	int GetHealth() const;
-	int GetNumOfLivesLeft() const;
 
 protected:
 
@@ -30,9 +29,8 @@ private:
 
 	//Member Data:
 public:
-	int m_score;
 	int m_health;
-	int m_numOfLivesLeft;
+	WeaponType m_weaponType;
 
 protected:
 

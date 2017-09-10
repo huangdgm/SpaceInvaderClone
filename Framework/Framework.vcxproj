@@ -82,7 +82,8 @@
   <ItemGroup>
     <ClInclude Include="animatedsprite.h" />
     <ClInclude Include="backbuffer.h" />
-    <ClInclude Include="bullet.h" />
+    <ClInclude Include="enemybullet.h" />
+    <ClInclude Include="playerbullet.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="explosion.h" />
@@ -98,12 +99,14 @@
     <ClInclude Include="texture.h" />
     <ClInclude Include="texturemanager.h" />
     <ClInclude Include="vector2d.h" />
+    <ClInclude Include="weapontype.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="animatedsprite.cpp" />
     <ClCompile Include="backbuffer.cpp" />
-    <ClCompile Include="bullet.cpp" />
+    <ClCompile Include="playerbullet.cpp" />
     <ClCompile Include="enemy.cpp" />
+    <ClCompile Include="enemybullet.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="explosion.cpp" />
     <ClCompile Include="game.cpp" />

@@ -4,7 +4,8 @@
 
 // Local includes:
 #include "enemy.h"
-#include "bullet.h"
+#include "playerbullet.h"
+#include "enemybullet.h"
 #include "animatedsprite.h"
 #include "explosion.h"
 #include "texture.h"
@@ -42,7 +43,12 @@ public:
 	void FireSpaceShipBullet();
 
 	void SpawnEnemy(int x, int y);
+	void SpawnPlayerShip();
+	void SpawnEnemyBullet();
 	void SpawnExplosion(float x, float y);
+
+	bool HasMoreLives();
+	void UpdatePlayerShip(PlayerShip* playerShip);
 
 protected:
 	void Process(float deltaTime);
@@ -92,26 +98,36 @@ protected:
 	Sprite* m_pEnemySprite;
 	Sprite* m_pPlayerSprite;
 	Sprite* m_pPlayerBulletSprite;
+	Sprite* m_pEnemyBulletSprite;
 	Sprite* m_pBackgroundSprite;
 	Sprite* m_pInfoPanelSprite;
 
 	PlayerShip* m_pPlayerShip;
 	Enemy* m_pEnemy;
-	Bullet* m_pBullet;
+	PlayerBullet* m_pPlayerBullet;
+	EnemyBullet* m_pEnemyBullet;
 	Explosion* m_pExplosion;
 	InfoPanel* m_pInfoPanel;
 
-	const static int NUM_OF_ENEMY_COLS = 10;
+	const static int MAX_NUM_OF_ENEMY = 10;
+	const static int MAX_NUM_OF_PLAYER_SHIP = 3;
 
-	const static int MAX_NUM_OF_BULLETS = 30;
+	const static int MAX_NUM_OF_PLAYER_BULLETS = 30;
+	const static int MAX_NUM_OF_ENEMY_BULLETS = 30;
 	const static int MAX_NUM_OF_EXPLOSIONS = 56;
 	const static int MAX_NUM_OF_ANIMATEDSPRITE = 56;
 
-	const static int VELOCITY_OF_BULLET = -800;
+	const static int VELOCITY_OF_PLAYER_BULLET = -800;
+	const static int VELOCITY_OF_ENEMY_BULLET = 100;
 	const static int VELOCITY_OF_PLAYERSHIP = 400;
+	const static int VELOCITY_OF_ENEMY = 50;
 
-	int m_indexOfBullet;
+	const static int DAMAGE_CAUSED_BY_ENEMY_BULLET = 34;
+
+	int m_indexOfPlayerBullet;
+	int m_indexOfEnemyBullet;
 	int m_indexOfEnemy;
+	int m_indexOfPlayerShip;
 	int m_indexOfExplosion;
 
 	int m_scrollingOffset;
@@ -124,10 +140,19 @@ protected:
 	Mix_Chunk* m_pBulletSoundEffect;
 
 	TTF_Font* m_pFont;
-	TextTexture* m_pTextTexture;
 
 	// The color for the font.
 	SDL_Color* m_pFontColor;
+
+	// The score text texture.
+	TextTexture* m_pScoreTextTexture;
+	TextTexture* m_pLevelTextTexture;
+	TextTexture* m_pLivesTextTexture;
+	TextTexture* m_pHealthTextTexture;
+
+	int m_level;
+	int m_score;
+	int m_numOfLivesLeft;
 
 private:
 

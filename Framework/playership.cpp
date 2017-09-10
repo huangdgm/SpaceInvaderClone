@@ -7,6 +7,7 @@
 #include "sprite.h"
 #include "backbuffer.h"
 #include "game.h"
+#include "weapontype.h"
 
 class Game;
 
@@ -19,9 +20,8 @@ class Game;
 // Ensure the constructor chains-up to the super class constructor.
 PlayerShip::PlayerShip()
 : Entity()
-, m_score(0)
-, m_health(0)
-, m_numOfLivesLeft(0)
+, m_health(100)
+, m_weaponType(SINGLE_BULLET)
 {
 
 }
@@ -37,12 +37,10 @@ PlayerShip::Initialise(Sprite* sprite)
 	Entity::Initialise(sprite);
 
 	m_dead = false;
-	m_health = 100;
-	m_numOfLivesLeft = 2;
 
 	// Dong: Set the initial position(384, 568) for the playership.
-	float positionX = (Game::WIDTH_OF_WINDOW - m_pSprite->GetWidth()) / 2.0f;
-	float positionY = (Game::HEIGHT_OF_WINDOW - m_pSprite->GetHeight()) * 1.0f;
+	float positionX = (Game::WIDTH_OF_PLAYING_PANEL - m_pSprite->GetWidth()) / 2.0f;
+	float positionY = (Game::HEIGHT_OF_PLAYING_PANEL - m_pSprite->GetHeight()) * 1.0f;
 
 	this->SetPosition(positionX, positionY);
 }
@@ -74,37 +72,13 @@ PlayerShip::Process(float deltaTime)
 }
 
 void
-PlayerShip::SetScore(int score)
-{
-	m_score = score;
-}
-
-void
 PlayerShip::SetHealth(int health)
 {
 	m_health = health;
-}
-
-void
-PlayerShip::SetNumOfLivesLeft(int numOfLivesLeft)
-{
-	m_numOfLivesLeft = numOfLivesLeft;
-}
-
-int 
-PlayerShip::GetScore() const
-{
-	return m_score;
 }
 
 int
 PlayerShip::GetHealth() const
 {
 	return m_health;
-}
-
-int
-PlayerShip::GetNumOfLivesLeft() const
-{
-	return m_numOfLivesLeft;
 }
