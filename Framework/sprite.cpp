@@ -125,3 +125,15 @@ Sprite::GetHeight() const
 {
 	return (m_height);
 }
+
+int
+Sprite::GetCenterX() const
+{
+	return m_centerX;
+}
+
+int
+Sprite::GetCenterY() const
+{
+	return m_centerY;
+}

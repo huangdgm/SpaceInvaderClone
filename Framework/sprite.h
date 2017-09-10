@@ -34,6 +34,9 @@ public:
 
 	int GetWidth() const;
 	int GetHeight() const;
+	
+	int GetCenterX() const;
+	int GetCenterY() const;
 
 	Texture* GetTexture();	// dong: no SetTexture() method
 

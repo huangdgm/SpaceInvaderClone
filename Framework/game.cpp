@@ -187,6 +187,11 @@ Game::Initialise()
 	m_pBackgroundSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\background.png");
 	m_pInfoPanelSprite = m_pBackBuffer->CreateSprite("assets\\infopanel.png");
 
+	m_pPlayerSprite->SetHandleCenter();
+	m_pEnemySprite->SetHandleCenter();
+	m_pPlayerBulletSprite->SetHandleCenter();
+	m_pEnemyBulletSprite->SetHandleCenter();
+
 	// Load audio.
 	m_pBackgroundMusic = Mix_LoadMUS("assets\\background.wav");;
 	m_pExplosionSoundEffect = Mix_LoadWAV("assets\\explosion.wav");
@@ -325,8 +330,8 @@ Game::Process(float deltaTime)
 			{
 				if (bullet->IsCollidingWith(*enemy))
 				{
-					float x = enemy->GetPositionX();
-					float y = enemy->GetPositionY();
+					float x = (enemy->GetPositionX() + bullet->GetPositionX() + m_pEnemySprite->GetCenterX() + m_pPlayerBulletSprite->GetCenterX()) / 2;
+					float y = (enemy->GetPositionY() + bullet->GetPositionY() + m_pEnemySprite->GetCenterY() + m_pPlayerBulletSprite->GetCenterY()) / 2;
 
 					// todo: change x, y
 					SpawnExplosion(x, y);
@@ -619,7 +624,7 @@ Game::SpawnEnemyBullet()
 
 	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
 	{
-		if (rand() % 100 > 96 && !(enemy->IsDead()))
+		if (rand() % 100 > 90 && !(enemy->IsDead()))
 		{
 			enemyBullet->Initialise(m_pEnemyBulletSprite);
 
@@ -648,8 +653,8 @@ Game::SpawnExplosion(float x, float y)
 
 	explosion->Initialise(m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png"));
 
-	explosion->SetPositionX(x);
-	explosion->SetPositionY(y);
+	explosion->SetPositionX(x - WIDTH_OF_ANIMATED_SPRITE_FRAME / 2);
+	explosion->SetPositionY(y - HEIGHT_OF_ANIMATED_SPRITE_FRAME / 2);
 
 	// Play the explosion sound effect.
 	Mix_PlayChannel(-1, m_pExplosionSoundEffect, 0);
