@@ -14,7 +14,7 @@ public:
 	~PlayerShip();
 
 	void Process(float deltaTime);
-	void Initialise(Sprite* sprite);
+	bool Initialise(Sprite* sprite);
 
 	void SetHealth(int health);
 	void SetNumOfLivesLeft(int numOfLivesLeft);

@@ -15,6 +15,7 @@
 #include "explosion.h"
 #include "infopanel.h"
 #include "texttexture.h"
+#include "gamestate.h"
 
 // Library includes:
 #include <cassert>
@@ -52,7 +53,8 @@ Game::DestroyInstance()
 Game::Game()
 : m_pBackBuffer(0)
 , m_pInputHandler(0)
-, m_looping(true)
+, m_gamePlayLooping(true)
+, m_splashScreenLooping(true)
 , m_executionTime(0)
 , m_elapsedSeconds(0)
 , m_frameCount(0)
@@ -71,10 +73,12 @@ Game::Game()
 , m_pEnemyBulletSprite(0)
 , m_pBackgroundSprite(0)
 , m_pInfoPanelSprite(0)
+, m_pSplashScreenSprite(0)
 , m_scrollingOffset(0)
 , m_pBackgroundMusic(0)
 , m_pExplosionSoundEffect(0)
 , m_pBulletSoundEffect(0)
+, m_pHurtSoundEffect(0)
 , m_pFont(0)
 , m_pFontColor(0)
 , m_pScoreTextTexture(0)
@@ -83,6 +87,8 @@ Game::Game()
 , m_pHealthTextTexture(0)
 , m_level(0)
 , m_score(0)
+, m_gameState(GAME_PLAY)
+, m_pSplashScreen(0)
 {
 	m_pEnemy = new Enemy[MAX_NUM_OF_ENEMY];
 	m_pPlayerShip = new PlayerShip[MAX_NUM_OF_PLAYER_SHIP];
@@ -121,6 +127,9 @@ Game::~Game()
 	delete m_pInfoPanelSprite;
 	m_pInfoPanelSprite = NULL;
 
+	delete m_pSplashScreenSprite;
+	m_pSplashScreenSprite = NULL;
+
 	delete[] m_pEnemy;
 	m_pEnemy = NULL;
 
@@ -145,6 +154,9 @@ Game::~Game()
 	Mix_FreeChunk(m_pBulletSoundEffect);
 	m_pBulletSoundEffect = NULL;
 
+	Mix_FreeChunk(m_pHurtSoundEffect);
+	m_pHurtSoundEffect = NULL;
+
 	TTF_CloseFont(m_pFont);
 	m_pFont = NULL;
 
@@ -162,11 +174,17 @@ Game::~Game()
 
 	delete m_pHealthTextTexture;
 	m_pHealthTextTexture = NULL;
+
+	delete m_pSplashScreen;
+	m_pSplashScreen = NULL;
 }
 
 bool
 Game::Initialise()
 {
+	// Create the splash screen.
+	//CreateSplashScreen();
+
 	// Create the back buffer.
 	CreateBackBuffer();
 
@@ -186,6 +204,7 @@ Game::Initialise()
 	m_pEnemyBulletSprite = m_pBackBuffer->CreateSprite("assets\\enemybullet.png");
 	m_pBackgroundSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\background.png");
 	m_pInfoPanelSprite = m_pBackBuffer->CreateSprite("assets\\infopanel.png");
+	m_pSplashScreenSprite = m_pBackBuffer->CreateSprite("assets\\splashscreen.png");
 
 	m_pPlayerSprite->SetHandleCenter();
 	m_pEnemySprite->SetHandleCenter();
@@ -193,9 +212,10 @@ Game::Initialise()
 	m_pEnemyBulletSprite->SetHandleCenter();
 
 	// Load audio.
-	m_pBackgroundMusic = Mix_LoadMUS("assets\\background.wav");;
+	m_pBackgroundMusic = Mix_LoadMUS("assets\\background.wav");
 	m_pExplosionSoundEffect = Mix_LoadWAV("assets\\explosion.wav");
 	m_pBulletSoundEffect = Mix_LoadWAV("assets\\bullet.wav");
+	m_pHurtSoundEffect = Mix_LoadWAV("assets\\hurt.wav");
 
 	// Create the player ship.
 	SpawnPlayerShip();
@@ -238,264 +258,78 @@ Game::Initialise()
 bool
 Game::DoGameLoop()
 {
-	const float stepSize = 1.0f / 60.0f;
-
-	assert(m_pInputHandler);
-	m_pInputHandler->ProcessInput(*this);
-
-	if (m_looping)
+	switch (m_gameState)
 	{
-		int current = SDL_GetTicks();
-		float deltaTime = (current - m_lastTime) / 1000.0f;
-		m_lastTime = current;
-
-		m_executionTime += deltaTime;
-
-		m_lag += deltaTime;
-
-		while (m_lag >= stepSize)
-		{
-			Process(stepSize);
-
-			m_lag -= stepSize;
-
-			++m_numUpdates;
-		}
-
-		Draw(*m_pBackBuffer);
+	case GAME_PLAY:
+		DoGamePlayLoop();
+		break;
+	case MAIN_MENU:
+		//DoMainMenuLoop();
+		break;
+	case SPLASH_SCREEN:
+		DoSplashScreenLoop();
+		break;
+	case PAUSED_MENU:
+		//DoPausedMenuLoop();
+		break;
+	case GAME_SUMMARY:
+		//DoGameSummaryLoop();
+		break;
 	}
 
-	//	SDL_Delay(1);
-
-	return (m_looping);
+	return (true);	// for debug purpose.
 }
 
 void
 Game::Process(float deltaTime)
 {
-	// Count total simulation time elapsed:
-	m_elapsedSeconds += deltaTime;
-
-	// Frame Counter:
-	if (m_elapsedSeconds > 1)
+	switch (m_gameState)
 	{
-		m_elapsedSeconds -= 1;
-		m_FPS = m_frameCount;
-		m_frameCount = 0;
+	case GAME_PLAY:
+		ProcessGamePlay(deltaTime);
+		break;
+	case MAIN_MENU:
+		//ProcessMainMenu(deltaTime);
+		break;
+	case SPLASH_SCREEN:
+		ProcessSplashScreen(deltaTime);
+		break;
+	case PAUSED_MENU:
+		//ProcessPausedMenu(deltaTime);
+		break;
+	case GAME_SUMMARY:
+		//ProcessGameSummary(deltaTime);
+		break;
 	}
-
-	// Process the enemies.
-	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
-	{
-		if (!(enemy->IsDead()))
-		{
-			enemy->Process(deltaTime);
-		}
-	}
-
-	// Process the player bullets.
-	for (PlayerBullet* playerBullet = m_pPlayerBullet; playerBullet < m_pPlayerBullet + MAX_NUM_OF_PLAYER_BULLETS; playerBullet++)
-	{
-		if (!(playerBullet->IsDead()))
-		{
-			playerBullet->Process(deltaTime);
-		}
-	}
-
-	// Process the enemy bullets.
-	for (EnemyBullet* enemyBullet = m_pEnemyBullet; enemyBullet < m_pEnemyBullet + MAX_NUM_OF_ENEMY_BULLETS; enemyBullet++)
-	{
-		if (!(enemyBullet->IsDead()))
-		{
-			enemyBullet->Process(deltaTime);
-		}
-	}
-
-	// Process the player.
-	for (PlayerShip* playerShip = m_pPlayerShip; playerShip < m_pPlayerShip + MAX_NUM_OF_PLAYER_SHIP; playerShip++)
-	{
-		if (!(playerShip->IsDead()))
-		{
-			playerShip->Process(deltaTime);
-		}
-	}
-
-	// Check for the collisions between the enemies and the player bullets.
-	// If collisions detected, spawn the explosions.
-	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
-	{
-		for (PlayerBullet* bullet = m_pPlayerBullet; bullet < m_pPlayerBullet + MAX_NUM_OF_PLAYER_BULLETS; bullet++)
-		{
-			if (!(enemy->IsDead()) && !(bullet->IsDead()))
-			{
-				if (bullet->IsCollidingWith(*enemy))
-				{
-					float x = (enemy->GetPositionX() + bullet->GetPositionX() + m_pEnemySprite->GetCenterX() + m_pPlayerBulletSprite->GetCenterX()) / 2;
-					float y = (enemy->GetPositionY() + bullet->GetPositionY() + m_pEnemySprite->GetCenterY() + m_pPlayerBulletSprite->GetCenterY()) / 2;
-
-					// todo: change x, y
-					SpawnExplosion(x, y);
-					m_score += 10;
-
-					enemy->SetDead(true);
-					bullet->SetDead(true);
-				}
-			}
-		}
-	}
-
-	if (rand() % 100 > 95)
-	{
-		SpawnEnemyBullet();
-	}
-
-	// Check for the collisions between the player ship and the enemy bullets.
-	// If collisions detected, spawn the explosions.
-	for (EnemyBullet* enemyBullet = m_pEnemyBullet; enemyBullet < m_pEnemyBullet + MAX_NUM_OF_ENEMY_BULLETS; enemyBullet++)
-	{
-		for (PlayerShip* playerShip = m_pPlayerShip; playerShip < m_pPlayerShip + MAX_NUM_OF_PLAYER_SHIP; playerShip++)
-		{
-			if (!(enemyBullet->IsDead()) && !(playerShip->IsDead()))
-			{
-				if (playerShip->IsCollidingWith(*enemyBullet))
-				{
-					float x = playerShip->GetPositionX();
-					float y = playerShip->GetPositionY();
-
-					UpdatePlayerShip(playerShip);
-					enemyBullet->SetDead(true);
-					SpawnExplosion(x, y);
-				}
-			}
-		}
-	}
-
-	// Process the explosions.
-	for (Explosion* explosion = m_pExplosion; explosion < m_pExplosion + MAX_NUM_OF_EXPLOSIONS; explosion++)
-	{
-		if (!(explosion->IsDead()) && explosion->IsExplosing())
-		{
-			explosion->Process(deltaTime);
-		}
-	}
-
-	// Check for the collisions between the enemies and the player ship.
-	// If collision detected, spawn the explosion.
-	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
-	{
-		for (PlayerShip* playerShip = m_pPlayerShip; playerShip < m_pPlayerShip + MAX_NUM_OF_PLAYER_SHIP; playerShip++)
-		{
-			if (!(enemy->IsDead()) && !(playerShip->IsDead()))
-			{
-				if (playerShip->IsCollidingWith(*enemy))
-				{
-					float x = playerShip->GetPositionX();
-					float y = playerShip->GetPositionY();
-
-					UpdatePlayerShip(playerShip);
-					enemy->SetDead(true);
-					SpawnExplosion(x, y);
-				}
-			}
-		}
-	}
-
-	// Process the text texture.
-	m_pScoreTextTexture->LoadFromRenderedText(to_string(m_score), *m_pFontColor);
-	m_pLevelTextTexture->LoadFromRenderedText(to_string(m_level), *m_pFontColor);
-	m_pLivesTextTexture->LoadFromRenderedText(to_string(m_numOfLivesLeft), *m_pFontColor);
-	// Todo: create the GetCurrentPlayerShip() method.
-	m_pHealthTextTexture->LoadFromRenderedText(to_string((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetHealth()), *m_pFontColor);
-
-	// W03.3: Remove any dead explosions from the container...
 }
 
 void
 Game::Draw(BackBuffer& backBuffer)
 {
-	++m_frameCount;
-
-	backBuffer.Clear();
-
-	// Draw the scrolling background.
-	// To make the scrolling slower, the m_scrollingOffset is divided by 60.
-	m_scrollingOffset++;
-
-	if ((m_scrollingOffset / 60) > m_pBackgroundSprite->GetHeight())
+	switch (m_gameState)
 	{
-		m_scrollingOffset = 0;
+	case GAME_PLAY:
+		DrawGamePlay(backBuffer);
+		break;
+	case MAIN_MENU:
+		//DrawMainMenu(backBuffer);
+		break;
+	case SPLASH_SCREEN:
+		DrawSplashScreen(backBuffer);
+		break;
+	case PAUSED_MENU:
+		//DrawPausedMenu(backBuffer);
+		break;
+	case GAME_SUMMARY:
+		//DrawGameSummary(backBuffer);
+		break;
 	}
-
-	if (m_pBackgroundSprite)
-	{
-		m_pBackgroundSprite->DrawScrollingBackground(backBuffer, m_scrollingOffset / 60);
-	}
-
-	// Draw the info panel
-	if (!(m_pInfoPanel->IsDead()))
-	{
-		m_pInfoPanel->Draw(backBuffer);
-	}
-
-	// Draw the enemies.
-	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
-	{
-		if (!(enemy->IsDead()))
-		{
-			enemy->Draw(backBuffer);
-		}
-	}
-
-	// Draw the player bullets.
-	for (PlayerBullet* playerBullet = m_pPlayerBullet; playerBullet < m_pPlayerBullet + MAX_NUM_OF_PLAYER_BULLETS; playerBullet++)
-	{
-		if (!(playerBullet->IsDead()))
-		{
-			playerBullet->Draw(backBuffer);
-		}
-	}
-
-	// Draw the enemy bullets.
-	for (EnemyBullet* enemyBullet = m_pEnemyBullet; enemyBullet < m_pEnemyBullet + MAX_NUM_OF_ENEMY_BULLETS; enemyBullet++)
-	{
-		if (!(enemyBullet->IsDead()))
-		{
-			enemyBullet->Draw(backBuffer);
-		}
-	}
-
-	// Draw the player ship.
-	for (PlayerShip* playerShip = m_pPlayerShip; playerShip < m_pPlayerShip + MAX_NUM_OF_PLAYER_SHIP; playerShip++)
-	{
-		if (!(playerShip->IsDead()))
-		{
-			playerShip->Draw(backBuffer);
-		}
-	}
-
-	// Draw the explosions.
-	for (Explosion* explosion = m_pExplosion; explosion < m_pExplosion + MAX_NUM_OF_EXPLOSIONS; explosion++)
-	{
-		if (!(explosion->IsDead()) && explosion->IsExplosing())
-		{
-			explosion->Draw(backBuffer);
-		}
-	}
-
-	// Draw the text texture.
-	m_pScoreTextTexture->Render(690, 60);
-	m_pLevelTextTexture->Render(700, 250);
-	m_pLivesTextTexture->Render(736, 410);
-	m_pHealthTextTexture->Render(665, 580);
-
-	// Update the screen.
-	backBuffer.Present();
 }
 
 void
 Game::Quit()
 {
-	m_looping = false;
+	m_gamePlayLooping = false;
 }
 
 void
@@ -581,7 +415,7 @@ Game::SpawnEnemy(int x, int y)
 	}
 
 	enemy->Initialise(m_pEnemySprite);
-	enemy->SetPosition(x, y);
+	enemy->SetPosition(x * 1.0f, y * 1.0f);
 
 	// To make the enemies to move towards the bottom of the screen.
 	enemy->SetVerticalVelocity(VELOCITY_OF_ENEMY * 1.0f);
@@ -597,12 +431,13 @@ Game::SpawnPlayerShip()
 		playerShip = m_pPlayerShip + (m_indexOfPlayerShip++);
 	}
 
-	playerShip->Initialise(m_pPlayerSprite);
+	if (playerShip->Initialise(m_pPlayerSprite))
+	{
+		float positionX = (Game::WIDTH_OF_PLAYING_PANEL - m_pPlayerBulletSprite->GetWidth()) / 2.0f;
+		float positionY = (Game::HEIGHT_OF_PLAYING_PANEL - m_pPlayerBulletSprite->GetHeight()) * 1.0f;
 
-	float positionX = (Game::WIDTH_OF_PLAYING_PANEL - m_pPlayerBulletSprite->GetWidth()) / 2.0f;
-	float positionY = (Game::HEIGHT_OF_PLAYING_PANEL - m_pPlayerBulletSprite->GetHeight()) * 1.0f;
-
-	playerShip->SetPosition(positionX, positionY);
+		playerShip->SetPosition(positionX, positionY);
+	}
 }
 
 void
@@ -638,7 +473,19 @@ Game::SpawnEnemyBullet()
 		}
 	}
 
+	// The ratio between the horizontal velocity and the vertical velocity of the enemy bullet.
+	float r = (m_pPlayerShip->GetPositionX() - enemyBullet->GetPositionX()) / (m_pPlayerShip->GetPositionY() - enemyBullet->GetPositionY());
+
 	enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET * 1.0f);
+
+	if (r < 3)
+	{
+		enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * r);
+	}
+	else
+	{
+		enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * 3);
+	}
 }
 
 void
@@ -655,9 +502,6 @@ Game::SpawnExplosion(float x, float y)
 
 	explosion->SetPositionX(x - WIDTH_OF_ANIMATED_SPRITE_FRAME / 2);
 	explosion->SetPositionY(y - HEIGHT_OF_ANIMATED_SPRITE_FRAME / 2);
-
-	// Play the explosion sound effect.
-	Mix_PlayChannel(-1, m_pExplosionSoundEffect, 0);
 }
 
 bool
@@ -749,4 +593,380 @@ Game::UpdatePlayerShip(PlayerShip* playerShip)
 	{
 		playerShip->SetHealth(playerShip->GetHealth() - DAMAGE_CAUSED_BY_ENEMY_BULLET);
 	}
+}
+
+bool
+Game::DoGamePlayLoop()
+{
+	const float STEP_SIZE = 1.0f / 60.0f;
+
+	assert(m_pInputHandler);
+	m_pInputHandler->ProcessInputFromPlayGame(*this);
+
+	if (m_gamePlayLooping)
+	{
+		int current = SDL_GetTicks();
+		float deltaTime = (current - m_lastTime) / 1000.0f;
+		m_lastTime = current;
+
+		m_executionTime += deltaTime;
+
+		m_lag += deltaTime;
+
+		while (m_lag >= STEP_SIZE)
+		{
+			Process(STEP_SIZE);
+
+			m_lag -= STEP_SIZE;
+
+			++m_numUpdates;
+		}
+
+		Draw(*m_pBackBuffer);
+	}
+
+	//	SDL_Delay(1);
+
+	return (m_gamePlayLooping);
+}
+
+//bool
+//Game::ShowSplashScreen()
+//{
+//	//m_pSplashScreen->Draw();
+//	m_pInputHandler->ProcessInputFromSplashScreen(*m_pSplashScreen);
+//
+//	while (true)
+//	{
+//		Draw(*m_pBackBuffer);
+//	}
+//
+//	Draw(*m_pBackBuffer);
+//
+///*
+//	m_pSplashScreenSprite->Draw();
+//	return (true);
+//
+//	sf::Event event;
+//	while (true)
+//	{
+//		while (renderWindow.GetEvent(event))
+//		{
+//			if (event.Type == sf::Event::EventType::KeyPressed
+//				|| event.Type == sf::Event::EventType::MouseButtonPressed
+//				|| event.Type == sf::Event::EventType::Closed)
+//			{
+//				return;
+//			}
+//		}
+//	}*/
+//}
+
+//bool
+//Game::DoMainMenuLoop()
+//{
+//	return (true);
+//
+//}
+//
+//bool
+//Game::DoPausedMenuLoop()
+//{
+//	return (true);
+//
+//}
+//
+//bool
+//Game::DoGameSummaryLoop()
+//{
+//	return (true);
+//
+//}
+
+//bool
+//Game::CreateSplashScreen()
+//{
+//	SplashScreen* splashScreen = new SplashScreen();
+//
+//	splashScreen->Initialise(m_pSplashScreenSprite);
+//	splashScreen->SetPosition(0, 0);
+//
+//	return (true);
+//}
+
+
+void
+Game::ProcessGamePlay(float deltaTime)
+{
+	// Count total simulation time elapsed:
+	m_elapsedSeconds += deltaTime;
+
+	// Frame Counter:
+	if (m_elapsedSeconds > 1)
+	{
+		m_elapsedSeconds -= 1;
+		m_FPS = m_frameCount;
+		m_frameCount = 0;
+	}
+
+	// Process the enemies.
+	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
+	{
+		if (!(enemy->IsDead()))
+		{
+			enemy->Process(deltaTime);
+		}
+	}
+
+	// Process the player bullets.
+	for (PlayerBullet* playerBullet = m_pPlayerBullet; playerBullet < m_pPlayerBullet + MAX_NUM_OF_PLAYER_BULLETS; playerBullet++)
+	{
+		if (!(playerBullet->IsDead()))
+		{
+			playerBullet->Process(deltaTime);
+		}
+	}
+
+	// Process the enemy bullets.
+	for (EnemyBullet* enemyBullet = m_pEnemyBullet; enemyBullet < m_pEnemyBullet + MAX_NUM_OF_ENEMY_BULLETS; enemyBullet++)
+	{
+		if (!(enemyBullet->IsDead()))
+		{
+			enemyBullet->Process(deltaTime);
+		}
+	}
+
+	// Process the player.
+	for (PlayerShip* playerShip = m_pPlayerShip; playerShip < m_pPlayerShip + MAX_NUM_OF_PLAYER_SHIP; playerShip++)
+	{
+		if (!(playerShip->IsDead()))
+		{
+			playerShip->Process(deltaTime);
+		}
+	}
+
+	// Check for the collisions between the enemies and the player bullets.
+	// If collisions detected, spawn the explosions.
+	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
+	{
+		for (PlayerBullet* bullet = m_pPlayerBullet; bullet < m_pPlayerBullet + MAX_NUM_OF_PLAYER_BULLETS; bullet++)
+		{
+			if (!(enemy->IsDead()) && !(bullet->IsDead()))
+			{
+				if (bullet->IsCollidingWith(*enemy))
+				{
+					float x = (enemy->GetPositionX() + bullet->GetPositionX() + m_pEnemySprite->GetCenterX() + m_pPlayerBulletSprite->GetCenterX()) / 2;
+					float y = (enemy->GetPositionY() + bullet->GetPositionY() + m_pEnemySprite->GetCenterY() + m_pPlayerBulletSprite->GetCenterY()) / 2;
+
+					// todo: change x, y
+					SpawnExplosion(x, y);
+					m_score += 10;
+
+					enemy->SetDead(true);
+					bullet->SetDead(true);
+
+					// Play the explosion sound effect.
+					Mix_PlayChannel(-1, m_pExplosionSoundEffect, 0);
+				}
+			}
+		}
+	}
+
+	if (rand() % 100 > 95)
+	{
+		SpawnEnemyBullet();
+	}
+
+	// Check for the collisions between the player ship and the enemy bullets.
+	// If collisions detected, spawn the explosions.
+	for (EnemyBullet* enemyBullet = m_pEnemyBullet; enemyBullet < m_pEnemyBullet + MAX_NUM_OF_ENEMY_BULLETS; enemyBullet++)
+	{
+		for (PlayerShip* playerShip = m_pPlayerShip; playerShip < m_pPlayerShip + MAX_NUM_OF_PLAYER_SHIP; playerShip++)
+		{
+			if (!(enemyBullet->IsDead()) && !(playerShip->IsDead()))
+			{
+				if (playerShip->IsCollidingWith(*enemyBullet))
+				{
+					float x = playerShip->GetPositionX();
+					float y = playerShip->GetPositionY();
+
+					UpdatePlayerShip(playerShip);
+					enemyBullet->SetDead(true);
+					SpawnExplosion(x, y);
+
+					// Play the explosion sound effect.
+					Mix_PlayChannel(-1, m_pHurtSoundEffect, 0);
+				}
+			}
+		}
+	}
+
+	// Process the explosions.
+	for (Explosion* explosion = m_pExplosion; explosion < m_pExplosion + MAX_NUM_OF_EXPLOSIONS; explosion++)
+	{
+		if (!(explosion->IsDead()) && explosion->IsExplosing())
+		{
+			explosion->Process(deltaTime);
+		}
+	}
+
+	// Check for the collisions between the enemies and the player ship.
+	// If collision detected, spawn the explosion.
+	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
+	{
+		for (PlayerShip* playerShip = m_pPlayerShip; playerShip < m_pPlayerShip + MAX_NUM_OF_PLAYER_SHIP; playerShip++)
+		{
+			if (!(enemy->IsDead()) && !(playerShip->IsDead()))
+			{
+				if (playerShip->IsCollidingWith(*enemy))
+				{
+					float x = (enemy->GetPositionX() + playerShip->GetPositionX() + m_pEnemySprite->GetCenterX() + m_pPlayerBulletSprite->GetCenterX()) / 2;
+					float y = (enemy->GetPositionY() + playerShip->GetPositionY() + m_pEnemySprite->GetCenterY() + m_pPlayerBulletSprite->GetCenterY()) / 2;
+
+					UpdatePlayerShip(playerShip);
+					enemy->SetDead(true);
+					SpawnExplosion(x, y);
+
+					// Play the explosion sound effect.
+					Mix_PlayChannel(-1, m_pHurtSoundEffect, 0);
+				}
+			}
+		}
+	}
+
+	// Process the text texture.
+	m_pScoreTextTexture->LoadFromRenderedText(to_string(m_score), *m_pFontColor);
+	m_pLevelTextTexture->LoadFromRenderedText(to_string(m_level), *m_pFontColor);
+	m_pLivesTextTexture->LoadFromRenderedText(to_string(m_numOfLivesLeft), *m_pFontColor);
+	// Todo: create the GetCurrentPlayerShip() method.
+	m_pHealthTextTexture->LoadFromRenderedText(to_string((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetHealth()), *m_pFontColor);
+
+	// W03.3: Remove any dead explosions from the container...
+}
+
+void
+Game::DrawGamePlay(BackBuffer& backBuffer)
+{
+	++m_frameCount;
+
+	backBuffer.Clear();
+
+	// Draw the scrolling background.
+	// To make the scrolling slower, the m_scrollingOffset is divided by 60.
+	m_scrollingOffset++;
+
+	if ((m_scrollingOffset / 60) > m_pBackgroundSprite->GetHeight())
+	{
+		m_scrollingOffset = 0;
+	}
+
+	if (m_pBackgroundSprite)
+	{
+		m_pBackgroundSprite->DrawScrollingBackground(backBuffer, m_scrollingOffset / 60);
+	}
+
+	// Draw the info panel
+	if (!(m_pInfoPanel->IsDead()))
+	{
+		m_pInfoPanel->Draw(backBuffer);
+	}
+
+	// Draw the enemies.
+	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
+	{
+		if (!(enemy->IsDead()))
+		{
+			enemy->Draw(backBuffer);
+		}
+	}
+
+	// Draw the player bullets.
+	for (PlayerBullet* playerBullet = m_pPlayerBullet; playerBullet < m_pPlayerBullet + MAX_NUM_OF_PLAYER_BULLETS; playerBullet++)
+	{
+		if (!(playerBullet->IsDead()))
+		{
+			playerBullet->Draw(backBuffer);
+		}
+	}
+
+	// Draw the enemy bullets.
+	for (EnemyBullet* enemyBullet = m_pEnemyBullet; enemyBullet < m_pEnemyBullet + MAX_NUM_OF_ENEMY_BULLETS; enemyBullet++)
+	{
+		if (!(enemyBullet->IsDead()))
+		{
+			enemyBullet->Draw(backBuffer);
+		}
+	}
+
+	// Draw the player ship.
+	for (PlayerShip* playerShip = m_pPlayerShip; playerShip < m_pPlayerShip + MAX_NUM_OF_PLAYER_SHIP; playerShip++)
+	{
+		if (!(playerShip->IsDead()))
+		{
+			playerShip->Draw(backBuffer);
+		}
+	}
+
+	// Draw the explosions.
+	for (Explosion* explosion = m_pExplosion; explosion < m_pExplosion + MAX_NUM_OF_EXPLOSIONS; explosion++)
+	{
+		if (!(explosion->IsDead()) && explosion->IsExplosing())
+		{
+			explosion->Draw(backBuffer);
+		}
+	}
+
+	// Draw the text texture.
+	m_pScoreTextTexture->Render(690, 60);
+	m_pLevelTextTexture->Render(700, 250);
+	m_pLivesTextTexture->Render(736, 410);
+	m_pHealthTextTexture->Render(665, 580);
+
+	// Update the screen.
+	backBuffer.Present();
+}
+
+bool
+Game::DoSplashScreenLoop()
+{
+	const float STEP_SIZE = 1.0f / 60.0f;
+
+	assert(m_pInputHandler);
+	m_pInputHandler->ProcessInputFromSplashScreen(*m_pSplashScreen);
+
+	if (m_splashScreenLooping)
+	{
+		int current = SDL_GetTicks();
+		float deltaTime = (current - m_lastTime) / 1000.0f;
+		m_lastTime = current;
+
+		m_executionTime += deltaTime;
+
+		m_lag += deltaTime;
+
+		while (m_lag >= STEP_SIZE)
+		{
+			Process(STEP_SIZE);
+
+			m_lag -= STEP_SIZE;
+
+			++m_numUpdates;
+		}
+
+		Draw(*m_pBackBuffer);
+	}
+
+	//	SDL_Delay(1);
+
+	return (m_splashScreenLooping);
+}
+
+void
+Game::ProcessSplashScreen(float deltaTime)
+{
+}
+
+void
+Game::DrawSplashScreen(BackBuffer& backBuffer)
+{
 }

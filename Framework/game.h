@@ -10,6 +10,8 @@
 #include "explosion.h"
 #include "texture.h"
 #include "texttexture.h"
+#include "gamestate.h"
+#include "splashscreen.h"
 
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
@@ -54,6 +56,7 @@ protected:
 	void Process(float deltaTime);
 	void Draw(BackBuffer& backBuffer);
 
+	bool CreateSplashScreen();
 	bool CreateBackBuffer();
 	bool CreateInputHandler();
 	bool CreateTTFFont();
@@ -64,6 +67,24 @@ private:
 	Game& operator=(const Game& game);
 	
 	Game();
+
+	bool DoGamePlayLoop();
+	bool DoSplashScreenLoop();
+	//bool DoMainMenuLoop();
+	//bool DoPausedMenuLoop();
+	//bool DoGameSummaryLoop();
+
+	void ProcessGamePlay(float deltaTime);
+	void ProcessSplashScreen(float deltaTime);
+	//void ProcessMainMenu(float deltaTime);
+	//void ProcessPausedMenu(float deltaTime);
+	//void ProcessGameSummary(float deltaTime);
+
+	void DrawGamePlay(BackBuffer& backBuffer);
+	void DrawSplashScreen(BackBuffer& backBuffer);
+	//void DrawMainMenu(BackBuffer& backBuffer);
+	//void DrawPausedMenu(BackBuffer& backBuffer);
+	//void DrawGameSummary(BackBuffer& backBuffer);
 
 	//Member Data:
 public:
@@ -83,7 +104,9 @@ protected:
 	static Game* sm_pInstance;
 	BackBuffer* m_pBackBuffer;
 	InputHandler* m_pInputHandler;
-	bool m_looping;
+
+	bool m_gamePlayLooping;
+	bool m_splashScreenLooping;
 
 	// Simulation Counters:
 	float m_elapsedSeconds;
@@ -101,6 +124,7 @@ protected:
 	Sprite* m_pEnemyBulletSprite;
 	Sprite* m_pBackgroundSprite;
 	Sprite* m_pInfoPanelSprite;
+	Sprite* m_pSplashScreenSprite;
 
 	PlayerShip* m_pPlayerShip;
 	Enemy* m_pEnemy;
@@ -118,9 +142,9 @@ protected:
 	const static int MAX_NUM_OF_ANIMATEDSPRITE = 56;
 
 	const static int VELOCITY_OF_PLAYER_BULLET = -800;
-	const static int VELOCITY_OF_ENEMY_BULLET = 100;
+	const static int VELOCITY_OF_ENEMY_BULLET = 200;
 	const static int VELOCITY_OF_PLAYERSHIP = 400;
-	const static int VELOCITY_OF_ENEMY = 50;
+	const static int VELOCITY_OF_ENEMY = 40;
 
 	const static int DAMAGE_CAUSED_BY_ENEMY_BULLET = 34;
 
@@ -138,6 +162,7 @@ protected:
 	// The sound effects.
 	Mix_Chunk* m_pExplosionSoundEffect;
 	Mix_Chunk* m_pBulletSoundEffect;
+	Mix_Chunk* m_pHurtSoundEffect;
 
 	TTF_Font* m_pFont;
 
@@ -153,6 +178,10 @@ protected:
 	int m_level;
 	int m_score;
 	int m_numOfLivesLeft;
+
+	GameState m_gameState;
+
+	SplashScreen* m_pSplashScreen;
 
 private:
 

@@ -1,5 +1,8 @@
 // COMP710 GP 2D Framework 2017
 
+// The background.wav music is owned by Jan125 from:
+// https://opengameart.org/content/stereotypical-90s-space-shooter-music
+
 // Library includes:
 #include <SDL.h>
 #include <crtdbg.h>
@@ -14,7 +17,7 @@ int main(int argc, char* argv[])
 	// detect memory leak
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	srand(time(0));
+	srand((unsigned int)time(0));
 
 	Game& gameInstance = Game::GetInstance();
 

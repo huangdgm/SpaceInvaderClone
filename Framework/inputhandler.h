@@ -7,6 +7,7 @@
 
 // Forward Declarations:
 class Game;
+class SplashScreen;
 
 class InputHandler
 {
@@ -16,7 +17,8 @@ public:
 	~InputHandler();
 
 	bool Initialise();
-	void ProcessInput(Game& game);
+	void ProcessInputFromPlayGame(Game& game);
+	void ProcessInputFromSplashScreen(SplashScreen& splashScreen);
 
 protected:
 

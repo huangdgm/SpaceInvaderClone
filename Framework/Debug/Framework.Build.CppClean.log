@@ -1,6 +1,5 @@
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\vc120.pdb
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\vc120.idb
-c:\users\xfn\desktop\spaceinvaderclone\framework\debug\animatedsprite.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\backbuffer.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\playerbullet.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\enemy.obj
@@ -15,11 +14,13 @@ c:\users\xfn\desktop\spaceinvaderclone\framework\debug\main.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\particle.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\particleemitter.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\playership.obj
+c:\users\xfn\desktop\spaceinvaderclone\framework\debug\splashscreen.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\sprite.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\texttexture.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\texture.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\texturemanager.obj
 c:\users\xfn\desktop\spaceinvaderclone\framework\debug\vector2d.obj
+c:\users\xfn\desktop\spaceinvaderclone\framework\debug\animatedsprite.obj
 c:\users\xfn\desktop\spaceinvaderclone\debug\framework.ilk
 c:\users\xfn\desktop\spaceinvaderclone\debug\framework.exe
 c:\users\xfn\desktop\spaceinvaderclone\debug\framework.pdb

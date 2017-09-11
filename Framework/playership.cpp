@@ -31,7 +31,7 @@ PlayerShip::~PlayerShip()
 
 }
 
-void
+bool
 PlayerShip::Initialise(Sprite* sprite)
 {
 	Entity::Initialise(sprite);
@@ -43,6 +43,8 @@ PlayerShip::Initialise(Sprite* sprite)
 	float positionY = (Game::HEIGHT_OF_PLAYING_PANEL - m_pSprite->GetHeight()) * 1.0f;
 
 	this->SetPosition(positionX, positionY);
+
+	return (true);
 }
 
 void

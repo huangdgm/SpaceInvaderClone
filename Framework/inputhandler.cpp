@@ -55,7 +55,7 @@ InputHandler::Initialise()
 }
 
 void
-InputHandler::ProcessInput(Game& game)
+InputHandler::ProcessInputFromPlayGame(Game& game)
 {
 	SDL_Event e;
 
@@ -126,6 +126,28 @@ InputHandler::ProcessInput(Game& game)
 		case SDL_KEYUP:
 			game.StopSpaceShip();
 
+			break;
+		}
+	}
+}
+
+void
+InputHandler::ProcessInputFromSplashScreen(SplashScreen& splashScreen)
+{
+	SDL_Event e;
+
+	// Loop until there are no events left in the event queue.
+	// The SDL_PollEvent() function takes a pointer to an SDL_Event structure that is to be filled with event information.
+	while (SDL_PollEvent(&e) != 0)
+	{
+		switch (e.type)
+		{
+		case SDL_QUIT:
+			//game.Quit();
+
+			break;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_KEYDOWN:
 			break;
 		}
 	}
