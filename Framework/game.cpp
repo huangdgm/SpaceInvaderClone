@@ -794,7 +794,7 @@ Game::ProcessGamePlay(float deltaTime)
 					enemyBullet->SetDead(true);
 					SpawnExplosion(x, y);
 
-					// Play the explosion sound effect.
+					// Play the hurt sound effect.
 					Mix_PlayChannel(-1, m_pHurtSoundEffect, 0);
 				}
 			}
@@ -827,7 +827,7 @@ Game::ProcessGamePlay(float deltaTime)
 					enemy->SetDead(true);
 					SpawnExplosion(x, y);
 
-					// Play the explosion sound effect.
+					// Play the hurt sound effect.
 					Mix_PlayChannel(-1, m_pHurtSoundEffect, 0);
 				}
 			}
