@@ -42,13 +42,13 @@ EnemyBullet::Process(float deltaTime)
 	Entity::Process(deltaTime);
 
 	// Horizontal boundary checking and position capping.
-	if (m_x < 0 || m_x > Game::WIDTH_OF_PLAYING_PANEL)
+	if (m_x < (m_pSprite->GetWidth() * -1) || m_x > Game::WIDTH_OF_PLAYING_PANEL)
 	{
 		m_dead = true;
 	}
 
 	// Vertical boundary checking and position capping.
-	if (m_y > Game::HEIGHT_OF_PLAYING_PANEL)
+	if (m_y < (m_pSprite->GetHeight() * -1) || m_y > Game::HEIGHT_OF_PLAYING_PANEL)
 	{
 		m_dead = true;
 	}

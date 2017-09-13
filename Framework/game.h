@@ -133,20 +133,21 @@ protected:
 	Explosion* m_pExplosion;
 	InfoPanel* m_pInfoPanel;
 
-	const static int MAX_NUM_OF_ENEMY = 10;
+	const static int MAX_NUM_OF_ENEMY = 100;
 	const static int MAX_NUM_OF_PLAYER_SHIP = 3;
 
 	const static int MAX_NUM_OF_PLAYER_BULLETS = 30;
 	const static int MAX_NUM_OF_ENEMY_BULLETS = 30;
-	const static int MAX_NUM_OF_EXPLOSIONS = 56;
-	const static int MAX_NUM_OF_ANIMATEDSPRITE = 56;
+	const static int MAX_NUM_OF_EXPLOSIONS = 20;
+	const static int MAX_NUM_OF_ANIMATEDSPRITE = 20;
 
 	const static int VELOCITY_OF_PLAYER_BULLET = -800;
 	const static int VELOCITY_OF_ENEMY_BULLET = 200;
 	const static int VELOCITY_OF_PLAYERSHIP = 400;
-	const static int VELOCITY_OF_ENEMY = 40;
+	const static int VELOCITY_OF_ENEMY = 80;
 
 	const static int DAMAGE_CAUSED_BY_ENEMY_BULLET = 34;
+	const static int LEVEL_TIME_DURATION = 100;
 
 	int m_indexOfPlayerBullet;
 	int m_indexOfEnemyBullet;

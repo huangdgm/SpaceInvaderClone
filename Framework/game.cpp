@@ -24,6 +24,7 @@
 #include <vector>
 #include <algorithm>
 #include <SDL_mixer.h>
+#include <cmath>
 
 using namespace std;
 
@@ -223,7 +224,10 @@ Game::Initialise()
 	// Create the enemies.
 	for (int i = 0; i < MAX_NUM_OF_ENEMY; i++)
 	{
-		SpawnEnemy(i*50, 0);
+		int positionX = rand() % (WIDTH_OF_PLAYING_PANEL - m_pEnemySprite->GetWidth());
+		int positionY = rand() % (LEVEL_TIME_DURATION * VELOCITY_OF_ENEMY) * (-1);
+
+		SpawnEnemy(positionX, positionY);
 	}
 
 	// Create the info panel.
@@ -381,7 +385,6 @@ Game::FireSpaceShipBullet()
 	if (m_indexOfPlayerBullet < MAX_NUM_OF_PLAYER_BULLETS)
 	{
 		bullet = m_pPlayerBullet + m_indexOfPlayerBullet;
-
 		m_indexOfPlayerBullet++;
 	}
 	else
@@ -390,15 +393,18 @@ Game::FireSpaceShipBullet()
 		m_indexOfPlayerBullet = 0;
 	}
 
-	bullet->Initialise(m_pPlayerBulletSprite);
+	assert(bullet);
 
-	float positionX = ((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetPositionX() + (m_pPlayerSprite->GetWidth() - m_pPlayerBulletSprite->GetWidth()) / 2) * 1.0f;
-	float positionY = ((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetPositionY() - m_pPlayerBulletSprite->GetHeight()) * 1.0f;
+	if (bullet->Initialise(m_pPlayerBulletSprite))
+	{
+		float positionX = ((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetPositionX() + (m_pPlayerSprite->GetWidth() - m_pPlayerBulletSprite->GetWidth()) / 2) * 1.0f;
+		float positionY = ((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetPositionY() - m_pPlayerBulletSprite->GetHeight()) * 1.0f;
 
-	bullet->SetPositionX(positionX);
-	bullet->SetPositionY(positionY);
+		bullet->SetPositionX(positionX);
+		bullet->SetPositionY(positionY);
 
-	bullet->SetVerticalVelocity(VELOCITY_OF_PLAYER_BULLET * 1.0f);
+		bullet->SetVerticalVelocity(VELOCITY_OF_PLAYER_BULLET * 1.0f);
+	}
 
 	// Play the bullet sound effect.
 	Mix_PlayChannel(-1, m_pBulletSoundEffect, 0);
@@ -407,29 +413,45 @@ Game::FireSpaceShipBullet()
 void
 Game::SpawnEnemy(int x, int y)
 {
-	Enemy* enemy = NULL;
+	Enemy* enemy = m_pEnemy;
 
 	if (m_indexOfEnemy < MAX_NUM_OF_ENEMY)
 	{
-		enemy = m_pEnemy + (m_indexOfEnemy++);
+		enemy = m_pEnemy + m_indexOfEnemy;
+		m_indexOfEnemy++;
+	}
+	else
+	{
+		m_indexOfEnemy = 0;
 	}
 
-	enemy->Initialise(m_pEnemySprite);
-	enemy->SetPosition(x * 1.0f, y * 1.0f);
+	assert(enemy);
+	
+	if (enemy->Initialise(m_pEnemySprite))
+	{
+		enemy->SetPosition(x * 1.0f, y * 1.0f);
 
-	// To make the enemies to move towards the bottom of the screen.
-	enemy->SetVerticalVelocity(VELOCITY_OF_ENEMY * 1.0f);
+		// To make the enemies to move towards the bottom of the screen.
+		enemy->SetVerticalVelocity(VELOCITY_OF_ENEMY * 1.0f);
+	}
 }
 
 void
 Game::SpawnPlayerShip()
 {
-	PlayerShip* playerShip = NULL;
+	PlayerShip* playerShip = m_pPlayerShip;
 
 	if (m_indexOfPlayerShip < MAX_NUM_OF_PLAYER_SHIP)
 	{
-		playerShip = m_pPlayerShip + (m_indexOfPlayerShip++);
+		playerShip = m_pPlayerShip + m_indexOfPlayerShip;
+		m_indexOfPlayerShip++;
 	}
+	else
+	{
+		m_indexOfPlayerShip = 0;
+	}
+
+	assert(playerShip);
 
 	if (playerShip->Initialise(m_pPlayerSprite))
 	{
@@ -448,7 +470,6 @@ Game::SpawnEnemyBullet()
 	if (m_indexOfEnemyBullet < MAX_NUM_OF_ENEMY_BULLETS)
 	{
 		enemyBullet = m_pEnemyBullet + m_indexOfEnemyBullet;
-
 		m_indexOfEnemyBullet++;
 	}
 	else
@@ -459,7 +480,7 @@ Game::SpawnEnemyBullet()
 
 	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
 	{
-		if (rand() % 100 > 90 && !(enemy->IsDead()))
+		if (rand() % 100 > 90 && !(enemy->IsDead()) && enemy->GetPositionY() >= 0)
 		{
 			enemyBullet->Initialise(m_pEnemyBulletSprite);
 
@@ -469,39 +490,58 @@ Game::SpawnEnemyBullet()
 			enemyBullet->SetPositionX(positionX);
 			enemyBullet->SetPositionY(positionY);
 
-			break;
+			// The ratio between the horizontal velocity and the vertical velocity of the enemy bullet.
+			PlayerShip* playerShip = m_pPlayerShip + m_indexOfPlayerShip - 1;
+			float r = abs((playerShip->GetPositionX() - enemyBullet->GetPositionX()) / (playerShip->GetPositionY() - enemyBullet->GetPositionY()));
+
+			r = r > 3 ? 3 : r;
+
+			if (playerShip->GetPositionY() < enemyBullet->GetPositionY() && playerShip->GetPositionX() < enemyBullet->GetPositionX())
+			{
+				enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET * -1.0f);
+				enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * r * -1);
+			}
+			else if (playerShip->GetPositionY() < enemyBullet->GetPositionY() && playerShip->GetPositionX() > enemyBullet->GetPositionX())
+			{
+				enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET * -1.0f);
+				enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * r);
+			}
+			else if (playerShip->GetPositionY() > enemyBullet->GetPositionY() && playerShip->GetPositionX() < enemyBullet->GetPositionX())
+			{
+				enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET);
+				enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * r * -1);
+			}
+			else if (playerShip->GetPositionY() > enemyBullet->GetPositionY() && playerShip->GetPositionX() > enemyBullet->GetPositionX())
+			{
+				enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET);
+				enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * r);
+			}
 		}
-	}
-
-	// The ratio between the horizontal velocity and the vertical velocity of the enemy bullet.
-	float r = (m_pPlayerShip->GetPositionX() - enemyBullet->GetPositionX()) / (m_pPlayerShip->GetPositionY() - enemyBullet->GetPositionY());
-
-	enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET * 1.0f);
-
-	if (r < 3)
-	{
-		enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * r);
-	}
-	else
-	{
-		enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * 3);
 	}
 }
 
 void
 Game::SpawnExplosion(float x, float y)
 {
-	Explosion* explosion = NULL;
+	Explosion* explosion = m_pExplosion;
 
 	if (m_indexOfExplosion < MAX_NUM_OF_EXPLOSIONS)
 	{
-		explosion = m_pExplosion + (m_indexOfExplosion++);
+		explosion = m_pExplosion + m_indexOfExplosion;
+		m_indexOfExplosion++;
+	}
+	else
+	{
+		m_indexOfExplosion = 0;
 	}
 
-	explosion->Initialise(m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png"));
+	assert(explosion);
 
-	explosion->SetPositionX(x - WIDTH_OF_ANIMATED_SPRITE_FRAME / 2);
-	explosion->SetPositionY(y - HEIGHT_OF_ANIMATED_SPRITE_FRAME / 2);
+	if (explosion->Initialise(m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png")))
+	{
+		explosion->SetPositionX(x - WIDTH_OF_ANIMATED_SPRITE_FRAME / 2);
+		explosion->SetPositionY(y - HEIGHT_OF_ANIMATED_SPRITE_FRAME / 2);
+	}
 }
 
 bool

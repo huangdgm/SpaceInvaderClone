@@ -39,4 +39,9 @@ PlayerBullet::Process(float deltaTime)
 {
 	// Ensure the process method chains-up to the super class process method.
 	Entity::Process(deltaTime);
+
+	if (m_y <= m_pSprite->GetHeight() * (-1))
+	{
+		m_dead = true;
+	}
 }
