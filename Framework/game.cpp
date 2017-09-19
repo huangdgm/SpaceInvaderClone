@@ -68,6 +68,7 @@ Game::Game()
 , m_indexOfEnemy(0)
 , m_indexOfPlayerShip(0)
 , m_indexOfExplosion(0)
+, m_indexOfExplosionAnimatedSprite(0)
 , m_pEnemySprite(0)
 , m_pPlayerSprite(0)
 , m_pPlayerBulletSprite(0)
@@ -96,18 +97,19 @@ Game::Game()
 	m_pPlayerBullet = new PlayerBullet[MAX_NUM_OF_PLAYER_BULLETS];
 	m_pEnemyBullet = new EnemyBullet[MAX_NUM_OF_ENEMY_BULLETS];
 	m_pExplosion = new Explosion[MAX_NUM_OF_EXPLOSIONS];
+	m_pExplosionAnimatedSprite = new AnimatedSprite[MAX_NUM_OF_EXPLOSIONS];
 	m_numOfLivesLeft = MAX_NUM_OF_PLAYER_SHIP - 1;
 }
 
 Game::~Game()
 {
-	delete m_pBackBuffer;
+	delete m_pBackBuffer;//
 	m_pBackBuffer = NULL;
 
-	delete m_pInputHandler;
+	delete m_pInputHandler;//
 	m_pInputHandler = NULL;
 
-	delete m_pInfoPanel;
+	delete m_pInfoPanel;//
 	m_pInfoPanel = NULL;
 
 	delete m_pEnemySprite;
@@ -131,19 +133,22 @@ Game::~Game()
 	delete m_pSplashScreenSprite;
 	m_pSplashScreenSprite = NULL;
 
-	delete[] m_pEnemy;
+	delete[] m_pExplosionAnimatedSprite;
+	m_pExplosionAnimatedSprite = NULL;
+
+	delete[] m_pEnemy;//
 	m_pEnemy = NULL;
 
-	delete[] m_pPlayerShip;
+	delete[] m_pPlayerShip;//
 	m_pPlayerShip = NULL;
 
-	delete[] m_pPlayerBullet;
+	delete[] m_pPlayerBullet;//
 	m_pPlayerBullet = NULL;
 
-	delete[] m_pEnemyBullet;
+	delete[] m_pEnemyBullet;//
 	m_pEnemyBullet = NULL;
 
-	delete[] m_pExplosion;
+	delete[] m_pExplosion;//
 	m_pExplosion = NULL;
 
 	Mix_FreeMusic(m_pBackgroundMusic);
@@ -161,19 +166,19 @@ Game::~Game()
 	TTF_CloseFont(m_pFont);
 	m_pFont = NULL;
 
-	delete m_pFontColor;
+	delete m_pFontColor;//
 	m_pFontColor = NULL;
 
-	delete m_pScoreTextTexture;
+	delete m_pScoreTextTexture;//
 	m_pScoreTextTexture = NULL;
 
-	delete m_pLevelTextTexture;
+	delete m_pLevelTextTexture;//
 	m_pLevelTextTexture = NULL;
 
-	delete m_pLivesTextTexture;
+	delete m_pLivesTextTexture;//
 	m_pLivesTextTexture = NULL;
 
-	delete m_pHealthTextTexture;
+	delete m_pHealthTextTexture;//
 	m_pHealthTextTexture = NULL;
 
 	delete m_pSplashScreen;
@@ -203,7 +208,7 @@ Game::Initialise()
 	m_pEnemySprite = m_pBackBuffer->CreateSprite("assets\\alienenemy.png");
 	m_pPlayerBulletSprite = m_pBackBuffer->CreateSprite("assets\\playerbullet.png");
 	m_pEnemyBulletSprite = m_pBackBuffer->CreateSprite("assets\\enemybullet.png");
-	m_pBackgroundSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\background.png");
+	m_pBackgroundSprite = m_pBackBuffer->CreateSprite("assets\\background.png");
 	m_pInfoPanelSprite = m_pBackBuffer->CreateSprite("assets\\infopanel.png");
 	m_pSplashScreenSprite = m_pBackBuffer->CreateSprite("assets\\splashscreen.png");
 
@@ -225,7 +230,7 @@ Game::Initialise()
 	for (int i = 0; i < MAX_NUM_OF_ENEMY; i++)
 	{
 		int positionX = rand() % (WIDTH_OF_PLAYING_PANEL - m_pEnemySprite->GetWidth());
-		int positionY = rand() % (LEVEL_TIME_DURATION * VELOCITY_OF_ENEMY) * (-1);
+		int positionY = rand() % (LEVEL_TIME_DURATION * AVERAGE_VELOCITY_OF_ENEMY) * (-1);
 
 		SpawnEnemy(positionX, positionY);
 	}
@@ -262,26 +267,28 @@ Game::Initialise()
 bool
 Game::DoGameLoop()
 {
+	bool result;
+
 	switch (m_gameState)
 	{
 	case GAME_PLAY:
-		DoGamePlayLoop();
+		result = DoGamePlayLoop();
 		break;
-	case MAIN_MENU:
-		//DoMainMenuLoop();
-		break;
-	case SPLASH_SCREEN:
-		DoSplashScreenLoop();
-		break;
-	case PAUSED_MENU:
-		//DoPausedMenuLoop();
-		break;
-	case GAME_SUMMARY:
-		//DoGameSummaryLoop();
-		break;
+	//case MAIN_MENU:
+	//	//DoMainMenuLoop();
+	//	break;
+	//case SPLASH_SCREEN:
+	//	DoSplashScreenLoop();
+	//	break;
+	//case PAUSED_MENU:
+	//	//DoPausedMenuLoop();
+	//	break;
+	//case GAME_SUMMARY:
+	//	//DoGameSummaryLoop();
+	//	break;
 	}
 
-	return (true);	// for debug purpose.
+	return result;	// for debug purpose.
 }
 
 void
@@ -292,18 +299,18 @@ Game::Process(float deltaTime)
 	case GAME_PLAY:
 		ProcessGamePlay(deltaTime);
 		break;
-	case MAIN_MENU:
-		//ProcessMainMenu(deltaTime);
-		break;
-	case SPLASH_SCREEN:
-		ProcessSplashScreen(deltaTime);
-		break;
-	case PAUSED_MENU:
-		//ProcessPausedMenu(deltaTime);
-		break;
-	case GAME_SUMMARY:
-		//ProcessGameSummary(deltaTime);
-		break;
+	//case MAIN_MENU:
+	//	//ProcessMainMenu(deltaTime);
+	//	break;
+	//case SPLASH_SCREEN:
+	//	ProcessSplashScreen(deltaTime);
+	//	break;
+	//case PAUSED_MENU:
+	//	//ProcessPausedMenu(deltaTime);
+	//	break;
+	//case GAME_SUMMARY:
+	//	//ProcessGameSummary(deltaTime);
+	//	break;
 	}
 }
 
@@ -315,18 +322,18 @@ Game::Draw(BackBuffer& backBuffer)
 	case GAME_PLAY:
 		DrawGamePlay(backBuffer);
 		break;
-	case MAIN_MENU:
-		//DrawMainMenu(backBuffer);
-		break;
-	case SPLASH_SCREEN:
-		DrawSplashScreen(backBuffer);
-		break;
-	case PAUSED_MENU:
-		//DrawPausedMenu(backBuffer);
-		break;
-	case GAME_SUMMARY:
-		//DrawGameSummary(backBuffer);
-		break;
+	//case MAIN_MENU:
+	//	//DrawMainMenu(backBuffer);
+	//	break;
+	//case SPLASH_SCREEN:
+	//	DrawSplashScreen(backBuffer);
+	//	break;
+	//case PAUSED_MENU:
+	//	//DrawPausedMenu(backBuffer);
+	//	break;
+	//case GAME_SUMMARY:
+	//	//DrawGameSummary(backBuffer);
+	//	break;
 	}
 }
 
@@ -431,8 +438,14 @@ Game::SpawnEnemy(int x, int y)
 	{
 		enemy->SetPosition(x * 1.0f, y * 1.0f);
 
-		// To make the enemies to move towards the bottom of the screen.
-		enemy->SetVerticalVelocity(VELOCITY_OF_ENEMY * 1.0f);
+		// To make the enemies to move towards the bottom of the screen, with a random velocity.
+		if (rand() % 2 == 0) {
+			enemy->SetVerticalVelocity(((rand() % STANDARD_DEVIATION_VELOCITY_OF_ENEMY) + AVERAGE_VELOCITY_OF_ENEMY) * 1.0f);
+		}
+		else
+		{
+			enemy->SetVerticalVelocity(((rand() % STANDARD_DEVIATION_VELOCITY_OF_ENEMY) * (-1) + AVERAGE_VELOCITY_OF_ENEMY) * 1.0f);
+		}
 	}
 }
 
@@ -524,6 +537,7 @@ void
 Game::SpawnExplosion(float x, float y)
 {
 	Explosion* explosion = m_pExplosion;
+	AnimatedSprite* explosionAnimatedSprite = m_pExplosionAnimatedSprite;
 
 	if (m_indexOfExplosion < MAX_NUM_OF_EXPLOSIONS)
 	{
@@ -535,9 +549,22 @@ Game::SpawnExplosion(float x, float y)
 		m_indexOfExplosion = 0;
 	}
 
+	if (m_indexOfExplosionAnimatedSprite < MAX_NUM_OF_EXPLOSIONS)
+	{
+		explosionAnimatedSprite = m_pExplosionAnimatedSprite + m_indexOfExplosionAnimatedSprite;
+		m_indexOfExplosionAnimatedSprite++;
+	}
+	else
+	{
+		m_indexOfExplosionAnimatedSprite = 0;
+	}
+
+	explosionAnimatedSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png");
+
 	assert(explosion);
 
-	if (explosion->Initialise(m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png")))
+	// Each explosion has a separate explosion animated sprite.
+	if (explosion->Initialise(explosionAnimatedSprite))
 	{
 		explosion->SetPositionX(x - WIDTH_OF_ANIMATED_SPRITE_FRAME / 2);
 		explosion->SetPositionY(y - HEIGHT_OF_ANIMATED_SPRITE_FRAME / 2);
@@ -832,7 +859,7 @@ Game::ProcessGamePlay(float deltaTime)
 
 					UpdatePlayerShip(playerShip);
 					enemyBullet->SetDead(true);
-					SpawnExplosion(x, y);
+					// SpawnExplosion(x, y);
 
 					// Play the hurt sound effect.
 					Mix_PlayChannel(-1, m_pHurtSoundEffect, 0);
@@ -966,40 +993,40 @@ Game::DrawGamePlay(BackBuffer& backBuffer)
 	backBuffer.Present();
 }
 
-bool
-Game::DoSplashScreenLoop()
-{
-	const float STEP_SIZE = 1.0f / 60.0f;
-
-	assert(m_pInputHandler);
-	m_pInputHandler->ProcessInputFromSplashScreen(*m_pSplashScreen);
-
-	if (m_splashScreenLooping)
-	{
-		int current = SDL_GetTicks();
-		float deltaTime = (current - m_lastTime) / 1000.0f;
-		m_lastTime = current;
-
-		m_executionTime += deltaTime;
-
-		m_lag += deltaTime;
-
-		while (m_lag >= STEP_SIZE)
-		{
-			Process(STEP_SIZE);
-
-			m_lag -= STEP_SIZE;
-
-			++m_numUpdates;
-		}
-
-		Draw(*m_pBackBuffer);
-	}
-
-	//	SDL_Delay(1);
-
-	return (m_splashScreenLooping);
-}
+//bool
+//Game::DoSplashScreenLoop()
+//{
+//	const float STEP_SIZE = 1.0f / 60.0f;
+//
+//	assert(m_pInputHandler);
+//	m_pInputHandler->ProcessInputFromSplashScreen(*m_pSplashScreen);
+//
+//	if (m_splashScreenLooping)
+//	{
+//		int current = SDL_GetTicks();
+//		float deltaTime = (current - m_lastTime) / 1000.0f;
+//		m_lastTime = current;
+//
+//		m_executionTime += deltaTime;
+//
+//		m_lag += deltaTime;
+//
+//		while (m_lag >= STEP_SIZE)
+//		{
+//			Process(STEP_SIZE);
+//
+//			m_lag -= STEP_SIZE;
+//
+//			++m_numUpdates;
+//		}
+//
+//		Draw(*m_pBackBuffer);
+//	}
+//
+//	//	SDL_Delay(1);
+//
+//	return (m_splashScreenLooping);
+//}
 
 void
 Game::ProcessSplashScreen(float deltaTime)

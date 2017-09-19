@@ -1,10 +1,33 @@
-﻿Build started 9/14/2017 9:28:42 PM.
+﻿Build started 9/19/2017 3:00:59 PM.
      1>Project "C:\Users\xfn\Desktop\SpaceInvaderClone\Framework\Framework.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2-2.0.5\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_mixer-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_image-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_ttf-2.0.14\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt game.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2-2.0.5\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_mixer-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_image-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_ttf-2.0.14\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt animatedsprite.cpp backbuffer.cpp playerbullet.cpp enemy.cpp enemybullet.cpp entity.cpp explosion.cpp game.cpp infopanel.cpp inputhandler.cpp logmanager.cpp main.cpp particle.cpp particleemitter.cpp playership.cpp splashscreen.cpp sprite.cpp texttexture.cpp texture.cpp texturemanager.cpp vector2d.cpp
+         vector2d.cpp
+         texturemanager.cpp
+         texture.cpp
+         texttexture.cpp
+         sprite.cpp
+         splashscreen.cpp
+         playership.cpp
+         particleemitter.cpp
+         particle.cpp
+         main.cpp
+         logmanager.cpp
+         inputhandler.cpp
+         infopanel.cpp
          game.cpp
-     1>c:\users\xfn\desktop\spaceinvaderclone\framework\game.cpp(511): warning C4244: 'argument' : conversion from 'const int' to 'float', possible loss of data
-     1>c:\users\xfn\desktop\spaceinvaderclone\framework\game.cpp(516): warning C4244: 'argument' : conversion from 'const int' to 'float', possible loss of data
+     1>c:\users\xfn\desktop\spaceinvaderclone\framework\game.cpp(524): warning C4244: 'argument' : conversion from 'const int' to 'float', possible loss of data
+     1>c:\users\xfn\desktop\spaceinvaderclone\framework\game.cpp(529): warning C4244: 'argument' : conversion from 'const int' to 'float', possible loss of data
+         explosion.cpp
+         entity.cpp
+         enemybullet.cpp
+         enemy.cpp
+         playerbullet.cpp
+         backbuffer.cpp
+         Generating Code...
+         Compiling...
+         animatedsprite.cpp
+         Generating Code...
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\Framework.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_mixer-2.0.1\lib\x86" /LIBPATH:"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2-2.0.5\lib\x86" /LIBPATH:"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_image-2.0.1\lib\x86" /LIBPATH:"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_ttf-2.0.14\lib\x86" SDL2.lib SDL2main.lib SDL2_image.lib SDL2_mixer.lib SDL2_ttf.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\Framework.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\Framework.lib" /MACHINE:X86 Debug\animatedsprite.obj
          Debug\backbuffer.obj
@@ -32,4 +55,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:04.80
+Time Elapsed 00:00:11.44
