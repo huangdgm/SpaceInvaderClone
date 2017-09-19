@@ -103,9 +103,6 @@ Game::Game()
 
 Game::~Game()
 {
-	delete m_pBackBuffer;//
-	m_pBackBuffer = NULL;
-
 	delete m_pInputHandler;//
 	m_pInputHandler = NULL;
 
@@ -183,6 +180,9 @@ Game::~Game()
 
 	delete m_pSplashScreen;
 	m_pSplashScreen = NULL;
+
+	delete m_pBackBuffer;//
+	m_pBackBuffer = NULL;
 }
 
 bool
@@ -521,12 +521,12 @@ Game::SpawnEnemyBullet()
 			}
 			else if (playerShip->GetPositionY() > enemyBullet->GetPositionY() && playerShip->GetPositionX() < enemyBullet->GetPositionX())
 			{
-				enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET);
+				enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET * 1.0f);
 				enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * r * -1);
 			}
 			else if (playerShip->GetPositionY() > enemyBullet->GetPositionY() && playerShip->GetPositionX() > enemyBullet->GetPositionX())
 			{
-				enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET);
+				enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET * 1.0f);
 				enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * r);
 			}
 		}
