@@ -642,7 +642,8 @@ Game::UpdatePlayerShip(PlayerShip* playerShip)
 		}
 		else
 		{
-			// game over
+			//QuitGamePlay();
+			//Game::sm_gameState = GAME_SUMMARY;
 		}
 
 		playerShip->SetDead(true);
