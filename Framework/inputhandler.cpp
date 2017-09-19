@@ -55,7 +55,89 @@ InputHandler::Initialise()
 }
 
 void
-InputHandler::ProcessInputFromPlayGame(Game& game)
+InputHandler::ProcessInput(Game& game)
+{
+	switch (Game::sm_gameState)
+	{
+	case SPLASH_SCREEN:
+		ProcessInputForSplashScreen(game);
+		break;
+	case MAIN_MENU:
+		ProcessInputForMainMenu(game);
+		break;
+	case GAME_PLAY:
+		ProcessInputForGamePlay(game);
+		break;
+	case PAUSED_MENU:
+		ProcessInputForPausedMenu(game);
+		break;
+	case GAME_SUMMARY:
+		ProcessInputForGameSummary(game);
+		break;
+	}
+}
+
+void
+InputHandler::ProcessInputForSplashScreen(Game& game)
+{
+	SDL_Event e;
+
+	while (SDL_PollEvent(&e) != 0)
+	{
+		switch (e.type)
+		{
+		case SDL_QUIT:
+			game.QuitGame();
+
+			break;
+		case SDL_JOYBUTTONDOWN:
+			if (e.jbutton.button == SDL_CONTROLLER_BUTTON_A)
+			{
+				if (game.IsPlayGameMenuInSplashScreenSelected())
+				{
+					Game::sm_gameState = GAME_PLAY;
+					game.QuitSplashScreen();
+				}
+				else if (game.IsQuitGameMenuInSplashScreenSelected())
+				{
+					game.QuitGame();
+				}
+			}
+
+			break;
+		case SDL_JOYHATMOTION:
+			if (e.jhat.value == SDL_HAT_UP)
+			{
+				game.SelectPlayGameMenuInSplashScreen();
+			}
+			else if (e.jhat.value == SDL_HAT_DOWN)
+			{
+				game.SelectQuitGameMenuInSplashScreen();
+			}
+
+			break;
+		case SDL_KEYDOWN:
+			if (e.key.keysym.sym == SDLK_UP)
+			{
+				game.SelectPlayGameMenuInSplashScreen();
+			}
+			else if (e.key.keysym.sym == SDLK_DOWN)
+			{
+				game.SelectQuitGameMenuInSplashScreen();
+			}
+
+			break;
+		}
+	}
+}
+
+void
+InputHandler::ProcessInputForMainMenu(Game& game)
+{
+}
+
+void
+InputHandler::ProcessInputForGamePlay(Game& game)
 {
 	SDL_Event e;
 
@@ -66,11 +148,10 @@ InputHandler::ProcessInputFromPlayGame(Game& game)
 		switch (e.type)
 		{
 		case SDL_QUIT:
-			game.Quit();
+			game.QuitGame();
 
 			break;
 		case SDL_JOYBUTTONDOWN:
-			// Tell the game to fire a player bullet...
 			if (e.jbutton.button == SDL_CONTROLLER_BUTTON_A)
 			{
 				game.FireSpaceShipBullet();
@@ -132,23 +213,12 @@ InputHandler::ProcessInputFromPlayGame(Game& game)
 }
 
 void
-InputHandler::ProcessInputFromSplashScreen(SplashScreen& splashScreen)
+InputHandler::ProcessInputForPausedMenu(Game& game)
 {
-	SDL_Event e;
-
-	// Loop until there are no events left in the event queue.
-	// The SDL_PollEvent() function takes a pointer to an SDL_Event structure that is to be filled with event information.
-	while (SDL_PollEvent(&e) != 0)
-	{
-		switch (e.type)
-		{
-		case SDL_QUIT:
-			//game.Quit();
-
-			break;
-		case SDL_JOYBUTTONDOWN:
-		case SDL_KEYDOWN:
-			break;
-		}
-	}
 }
+
+void
+InputHandler::ProcessInputForGameSummary(Game& game)
+{
+}
+

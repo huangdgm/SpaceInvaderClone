@@ -28,9 +28,9 @@ int main(int argc, char* argv[])
 		return (1);
 	}
 	
-	while (gameInstance.DoGameLoop())
+	while (Game::sm_gameState != GAME_QUIT)
 	{
-		// No body.
+		gameInstance.DoGameLoop();
 	}
 
 	Game::DestroyInstance();

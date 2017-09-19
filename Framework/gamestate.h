@@ -7,7 +7,8 @@ enum GameState
 	MAIN_MENU,
 	GAME_PLAY,
 	PAUSED_MENU,
-	GAME_SUMMARY
+	GAME_SUMMARY,
+	GAME_QUIT
 };
 
 #endif // __GAMESTATE_H__

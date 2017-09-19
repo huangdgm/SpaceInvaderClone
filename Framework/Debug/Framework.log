@@ -1,4 +1,4 @@
-﻿Build started 9/19/2017 6:06:06 PM.
+﻿Build started 9/20/2017 10:22:21 AM.
      1>Project "C:\Users\xfn\Desktop\SpaceInvaderClone\Framework\Framework.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2-2.0.5\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_mixer-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_image-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_ttf-2.0.14\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt animatedsprite.cpp backbuffer.cpp playerbullet.cpp enemy.cpp enemybullet.cpp entity.cpp explosion.cpp game.cpp infopanel.cpp inputhandler.cpp logmanager.cpp main.cpp particle.cpp particleemitter.cpp playership.cpp splashscreen.cpp sprite.cpp texttexture.cpp texture.cpp texturemanager.cpp vector2d.cpp
@@ -53,4 +53,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:11.62
+Time Elapsed 00:00:11.70

@@ -34,8 +34,10 @@ public:
 	~Game();
 
 	bool Initialise();
-	bool DoGameLoop();
-	void Quit();
+	void DoGameLoop();
+	void QuitGame();
+	void QuitGamePlay();
+	void QuitSplashScreen();
 
 	void StopSpaceShip();
 	void MoveSpaceShipLeft();
@@ -51,6 +53,12 @@ public:
 
 	bool HasMoreLives();
 	void UpdatePlayerShip(PlayerShip* playerShip);
+
+	bool IsPlayGameMenuInSplashScreenSelected();
+	bool IsQuitGameMenuInSplashScreenSelected();
+
+	void SelectPlayGameMenuInSplashScreen();
+	void SelectQuitGameMenuInSplashScreen();
 
 protected:
 	void Process(float deltaTime);
@@ -88,6 +96,8 @@ private:
 
 	//Member Data:
 public:
+	static GameState sm_gameState;
+
 	const static int WIDTH_OF_WINDOW = 800;
 	const static int HEIGHT_OF_WINDOW = 800;
 
@@ -124,7 +134,8 @@ protected:
 	Sprite* m_pEnemyBulletSprite;
 	Sprite* m_pBackgroundSprite;
 	Sprite* m_pInfoPanelSprite;
-	Sprite* m_pSplashScreenSprite;
+	Sprite* m_pPlayGameInSplashScreenSprite;
+	Sprite* m_pQuitGameInSplashScreenSprite;
 	AnimatedSprite* m_pExplosionAnimatedSprite;
 
 	PlayerShip* m_pPlayerShip;
@@ -183,9 +194,10 @@ protected:
 	int m_score;
 	int m_numOfLivesLeft;
 
-	GameState m_gameState;
-
 	SplashScreen* m_pSplashScreen;
+
+	bool m_playGameMenuInSplashScreenSelected;
+	bool m_quitGameMenuInSplashScreenSelected;
 
 private:
 

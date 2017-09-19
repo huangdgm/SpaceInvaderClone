@@ -17,8 +17,13 @@ public:
 	~InputHandler();
 
 	bool Initialise();
-	void ProcessInputFromPlayGame(Game& game);
-	void ProcessInputFromSplashScreen(SplashScreen& splashScreen);
+	void ProcessInput(Game& game);
+
+	void ProcessInputForSplashScreen(Game& game);
+	void ProcessInputForMainMenu(Game& game);
+	void ProcessInputForGamePlay(Game& game);
+	void ProcessInputForPausedMenu(Game& game);
+	void ProcessInputForGameSummary(Game& game);
 
 protected:
 

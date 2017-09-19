@@ -16,6 +16,8 @@ public:
 	void Process(float deltaTime);
 	void Initialise(Sprite* sprite);
 
+	void SetSprite(Sprite* sprite);
+
 protected:
 
 private:

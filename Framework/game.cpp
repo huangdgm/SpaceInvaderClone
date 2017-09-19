@@ -30,6 +30,7 @@ using namespace std;
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
+GameState Game::sm_gameState = SPLASH_SCREEN;
 
 Game&
 Game::GetInstance()
@@ -75,7 +76,8 @@ Game::Game()
 , m_pEnemyBulletSprite(0)
 , m_pBackgroundSprite(0)
 , m_pInfoPanelSprite(0)
-, m_pSplashScreenSprite(0)
+, m_pPlayGameInSplashScreenSprite(0)
+, m_pQuitGameInSplashScreenSprite(0)
 , m_scrollingOffset(0)
 , m_pBackgroundMusic(0)
 , m_pExplosionSoundEffect(0)
@@ -89,8 +91,9 @@ Game::Game()
 , m_pHealthTextTexture(0)
 , m_level(0)
 , m_score(0)
-, m_gameState(GAME_PLAY)
 , m_pSplashScreen(0)
+, m_playGameMenuInSplashScreenSelected(true)
+, m_quitGameMenuInSplashScreenSelected(false)
 {
 	m_pEnemy = new Enemy[MAX_NUM_OF_ENEMY];
 	m_pPlayerShip = new PlayerShip[MAX_NUM_OF_PLAYER_SHIP];
@@ -103,10 +106,10 @@ Game::Game()
 
 Game::~Game()
 {
-	delete m_pInputHandler;//
+	delete m_pInputHandler;
 	m_pInputHandler = NULL;
 
-	delete m_pInfoPanel;//
+	delete m_pInfoPanel;
 	m_pInfoPanel = NULL;
 
 	delete m_pEnemySprite;
@@ -127,25 +130,28 @@ Game::~Game()
 	delete m_pInfoPanelSprite;
 	m_pInfoPanelSprite = NULL;
 
-	delete m_pSplashScreenSprite;
-	m_pSplashScreenSprite = NULL;
+	delete m_pPlayGameInSplashScreenSprite;
+	m_pPlayGameInSplashScreenSprite = NULL;
+
+	delete m_pQuitGameInSplashScreenSprite;
+	m_pQuitGameInSplashScreenSprite = NULL;
 
 	delete[] m_pExplosionAnimatedSprite;
 	m_pExplosionAnimatedSprite = NULL;
 
-	delete[] m_pEnemy;//
+	delete[] m_pEnemy;
 	m_pEnemy = NULL;
 
-	delete[] m_pPlayerShip;//
+	delete[] m_pPlayerShip;
 	m_pPlayerShip = NULL;
 
-	delete[] m_pPlayerBullet;//
+	delete[] m_pPlayerBullet;
 	m_pPlayerBullet = NULL;
 
-	delete[] m_pEnemyBullet;//
+	delete[] m_pEnemyBullet;
 	m_pEnemyBullet = NULL;
 
-	delete[] m_pExplosion;//
+	delete[] m_pExplosion;
 	m_pExplosion = NULL;
 
 	Mix_FreeMusic(m_pBackgroundMusic);
@@ -163,34 +169,31 @@ Game::~Game()
 	TTF_CloseFont(m_pFont);
 	m_pFont = NULL;
 
-	delete m_pFontColor;//
+	delete m_pFontColor;
 	m_pFontColor = NULL;
 
-	delete m_pScoreTextTexture;//
+	delete m_pScoreTextTexture;
 	m_pScoreTextTexture = NULL;
 
-	delete m_pLevelTextTexture;//
+	delete m_pLevelTextTexture;
 	m_pLevelTextTexture = NULL;
 
-	delete m_pLivesTextTexture;//
+	delete m_pLivesTextTexture;
 	m_pLivesTextTexture = NULL;
 
-	delete m_pHealthTextTexture;//
+	delete m_pHealthTextTexture;
 	m_pHealthTextTexture = NULL;
 
 	delete m_pSplashScreen;
 	m_pSplashScreen = NULL;
 
-	delete m_pBackBuffer;//
+	delete m_pBackBuffer;
 	m_pBackBuffer = NULL;
 }
 
 bool
 Game::Initialise()
 {
-	// Create the splash screen.
-	//CreateSplashScreen();
-
 	// Create the back buffer.
 	CreateBackBuffer();
 
@@ -210,7 +213,8 @@ Game::Initialise()
 	m_pEnemyBulletSprite = m_pBackBuffer->CreateSprite("assets\\enemybullet.png");
 	m_pBackgroundSprite = m_pBackBuffer->CreateSprite("assets\\background.png");
 	m_pInfoPanelSprite = m_pBackBuffer->CreateSprite("assets\\infopanel.png");
-	m_pSplashScreenSprite = m_pBackBuffer->CreateSprite("assets\\splashscreen.png");
+	m_pPlayGameInSplashScreenSprite = m_pBackBuffer->CreateSprite("assets\\splashscreenplaygame.png");
+	m_pQuitGameInSplashScreenSprite = m_pBackBuffer->CreateSprite("assets\\splashscreenquitgame.png");
 
 	m_pPlayerSprite->SetHandleCenter();
 	m_pEnemySprite->SetHandleCenter();
@@ -222,6 +226,10 @@ Game::Initialise()
 	m_pExplosionSoundEffect = Mix_LoadWAV("assets\\explosion.wav");
 	m_pBulletSoundEffect = Mix_LoadWAV("assets\\bullet.wav");
 	m_pHurtSoundEffect = Mix_LoadWAV("assets\\hurt.wav");
+
+	// Create the splash screen
+	m_pSplashScreen = new SplashScreen();
+	m_pSplashScreen->Initialise(m_pPlayGameInSplashScreenSprite);
 
 	// Create the player ship.
 	SpawnPlayerShip();
@@ -264,83 +272,66 @@ Game::Initialise()
 	return (true);
 }
 
-bool
+void
 Game::DoGameLoop()
 {
-	bool result;
-
-	switch (m_gameState)
+	switch (sm_gameState)
 	{
 	case GAME_PLAY:
-		result = DoGamePlayLoop();
+		DoGamePlayLoop();
 		break;
-	//case MAIN_MENU:
-	//	//DoMainMenuLoop();
-	//	break;
-	//case SPLASH_SCREEN:
-	//	DoSplashScreenLoop();
-	//	break;
-	//case PAUSED_MENU:
-	//	//DoPausedMenuLoop();
-	//	break;
-	//case GAME_SUMMARY:
-	//	//DoGameSummaryLoop();
-	//	break;
+	case SPLASH_SCREEN:
+		DoSplashScreenLoop();
+		break;
 	}
-
-	return result;	// for debug purpose.
 }
 
 void
 Game::Process(float deltaTime)
 {
-	switch (m_gameState)
+	switch (sm_gameState)
 	{
 	case GAME_PLAY:
 		ProcessGamePlay(deltaTime);
 		break;
-	//case MAIN_MENU:
-	//	//ProcessMainMenu(deltaTime);
-	//	break;
-	//case SPLASH_SCREEN:
-	//	ProcessSplashScreen(deltaTime);
-	//	break;
-	//case PAUSED_MENU:
-	//	//ProcessPausedMenu(deltaTime);
-	//	break;
-	//case GAME_SUMMARY:
-	//	//ProcessGameSummary(deltaTime);
-	//	break;
+	case SPLASH_SCREEN:
+		ProcessSplashScreen(deltaTime);
+		break;
 	}
 }
 
 void
 Game::Draw(BackBuffer& backBuffer)
 {
-	switch (m_gameState)
+	switch (sm_gameState)
 	{
 	case GAME_PLAY:
 		DrawGamePlay(backBuffer);
 		break;
-	//case MAIN_MENU:
-	//	//DrawMainMenu(backBuffer);
-	//	break;
-	//case SPLASH_SCREEN:
-	//	DrawSplashScreen(backBuffer);
-	//	break;
-	//case PAUSED_MENU:
-	//	//DrawPausedMenu(backBuffer);
-	//	break;
-	//case GAME_SUMMARY:
-	//	//DrawGameSummary(backBuffer);
-	//	break;
+	case SPLASH_SCREEN:
+		DrawSplashScreen(backBuffer);
+		break;
 	}
 }
 
 void
-Game::Quit()
+Game::QuitGame()
+{
+	Game::sm_gameState = GAME_QUIT;
+	m_gamePlayLooping = false;
+	m_splashScreenLooping = false;
+}
+
+void
+Game::QuitGamePlay()
 {
 	m_gamePlayLooping = false;
+}
+
+void
+Game::QuitSplashScreen()
+{
+	m_splashScreenLooping = false;
 }
 
 void
@@ -655,6 +646,8 @@ Game::UpdatePlayerShip(PlayerShip* playerShip)
 		}
 
 		playerShip->SetDead(true);
+		// Spawn explosion when the player ship dies.
+		SpawnExplosion(playerShip->GetPositionX(), playerShip->GetPositionY());
 	}
 	else
 	{
@@ -668,7 +661,7 @@ Game::DoGamePlayLoop()
 	const float STEP_SIZE = 1.0f / 60.0f;
 
 	assert(m_pInputHandler);
-	m_pInputHandler->ProcessInputFromPlayGame(*this);
+	m_pInputHandler->ProcessInput(*this);
 
 	if (m_gamePlayLooping)
 	{
@@ -696,38 +689,6 @@ Game::DoGamePlayLoop()
 
 	return (m_gamePlayLooping);
 }
-
-//bool
-//Game::ShowSplashScreen()
-//{
-//	//m_pSplashScreen->Draw();
-//	m_pInputHandler->ProcessInputFromSplashScreen(*m_pSplashScreen);
-//
-//	while (true)
-//	{
-//		Draw(*m_pBackBuffer);
-//	}
-//
-//	Draw(*m_pBackBuffer);
-//
-///*
-//	m_pSplashScreenSprite->Draw();
-//	return (true);
-//
-//	sf::Event event;
-//	while (true)
-//	{
-//		while (renderWindow.GetEvent(event))
-//		{
-//			if (event.Type == sf::Event::EventType::KeyPressed
-//				|| event.Type == sf::Event::EventType::MouseButtonPressed
-//				|| event.Type == sf::Event::EventType::Closed)
-//			{
-//				return;
-//			}
-//		}
-//	}*/
-//}
 
 //bool
 //Game::DoMainMenuLoop()
@@ -993,47 +954,95 @@ Game::DrawGamePlay(BackBuffer& backBuffer)
 	backBuffer.Present();
 }
 
-//bool
-//Game::DoSplashScreenLoop()
-//{
-//	const float STEP_SIZE = 1.0f / 60.0f;
-//
-//	assert(m_pInputHandler);
-//	m_pInputHandler->ProcessInputFromSplashScreen(*m_pSplashScreen);
-//
-//	if (m_splashScreenLooping)
-//	{
-//		int current = SDL_GetTicks();
-//		float deltaTime = (current - m_lastTime) / 1000.0f;
-//		m_lastTime = current;
-//
-//		m_executionTime += deltaTime;
-//
-//		m_lag += deltaTime;
-//
-//		while (m_lag >= STEP_SIZE)
-//		{
-//			Process(STEP_SIZE);
-//
-//			m_lag -= STEP_SIZE;
-//
-//			++m_numUpdates;
-//		}
-//
-//		Draw(*m_pBackBuffer);
-//	}
-//
-//	//	SDL_Delay(1);
-//
-//	return (m_splashScreenLooping);
-//}
+bool
+Game::DoSplashScreenLoop()
+{
+	const float STEP_SIZE = 1.0f / 60.0f;
+
+	assert(m_pInputHandler);
+	m_pInputHandler->ProcessInput(*this);
+
+	if (m_splashScreenLooping)
+	{
+		int current = SDL_GetTicks();
+		float deltaTime = (current - m_lastTime) / 1000.0f;
+		m_lastTime = current;
+
+		m_executionTime += deltaTime;
+
+		m_lag += deltaTime;
+
+		while (m_lag >= STEP_SIZE)
+		{
+			Process(STEP_SIZE);
+
+			m_lag -= STEP_SIZE;
+
+			++m_numUpdates;
+		}
+
+		Draw(*m_pBackBuffer);
+	}
+
+	//	SDL_Delay(1);
+
+	return (m_splashScreenLooping);
+}
 
 void
 Game::ProcessSplashScreen(float deltaTime)
 {
+	// Count total simulation time elapsed:
+	m_elapsedSeconds += deltaTime;
+
+	// Frame Counter:
+	if (m_elapsedSeconds > 1)
+	{
+		m_elapsedSeconds -= 1;
+		m_FPS = m_frameCount;
+		m_frameCount = 0;
+	}
 }
 
 void
 Game::DrawSplashScreen(BackBuffer& backBuffer)
 {
+	++m_frameCount;
+
+	backBuffer.Clear();
+
+	m_pSplashScreen->Draw(backBuffer);
+
+	// Update the screen.
+	backBuffer.Present();
+}
+
+bool
+Game::IsPlayGameMenuInSplashScreenSelected()
+{
+	return m_playGameMenuInSplashScreenSelected;
+}
+
+bool
+Game::IsQuitGameMenuInSplashScreenSelected()
+{
+	return m_quitGameMenuInSplashScreenSelected;
+}
+
+void
+Game::SelectPlayGameMenuInSplashScreen()
+{
+	m_pSplashScreen->SetSprite(m_pPlayGameInSplashScreenSprite);
+
+	m_playGameMenuInSplashScreenSelected = true;
+	m_quitGameMenuInSplashScreenSelected = false;
+}
+
+void
+Game::SelectQuitGameMenuInSplashScreen()
+{
+	m_pSplashScreen->SetSprite(m_pQuitGameInSplashScreenSprite);
+
+	m_playGameMenuInSplashScreenSelected = false;
+	m_quitGameMenuInSplashScreenSelected = true;
 }
