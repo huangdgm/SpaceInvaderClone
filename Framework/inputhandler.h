@@ -7,7 +7,7 @@
 
 // Forward Declarations:
 class Game;
-class SplashScreen;
+class MainMenu;
 
 class InputHandler
 {

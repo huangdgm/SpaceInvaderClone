@@ -11,6 +11,7 @@
 #include "texture.h"
 #include "texttexture.h"
 #include "gamestate.h"
+#include "mainmenu.h"
 #include "splashscreen.h"
 
 #include <SDL_ttf.h>
@@ -37,8 +38,8 @@ public:
 	void DoGameLoop();
 
 	void QuitGame();
+	void QuitMainMenu();
 	void QuitGamePlay();
-	void QuitSplashScreen();
 
 	void StopSpaceShip();
 	void MoveSpaceShipLeft();
@@ -55,17 +56,16 @@ public:
 	bool HasMoreLives();
 	void UpdatePlayerShip(PlayerShip* playerShip);
 
-	bool IsPlayGameMenuInSplashScreenSelected();
-	bool IsQuitGameMenuInSplashScreenSelected();
+	bool IsPlayGameMenuInMainMenuSelected();
+	bool IsQuitGameMenuInMainMenuSelected();
 
-	void SelectPlayGameMenuInSplashScreen();
-	void SelectQuitGameMenuInSplashScreen();
+	void SelectPlayGameMenuInMainMenu();
+	void SelectQuitGameMenuInMainMenu();
 
 protected:
 	void Process(float deltaTime);
 	void Draw(BackBuffer& backBuffer);
 
-	bool CreateSplashScreen();
 	bool CreateBackBuffer();
 	bool CreateInputHandler();
 	bool CreateTTFFont();
@@ -78,19 +78,19 @@ private:
 	Game();
 
 	bool DoGamePlayLoop();
-	bool DoSplashScreenLoop();
+	bool DoMainMenuLoop();
 	//bool DoMainMenuLoop();
 	//bool DoPausedMenuLoop();
 	//bool DoGameSummaryLoop();
 
 	void ProcessGamePlay(float deltaTime);
-	void ProcessSplashScreen(float deltaTime);
+	void ProcessMainMenu(float deltaTime);
 	//void ProcessMainMenu(float deltaTime);
 	//void ProcessPausedMenu(float deltaTime);
 	//void ProcessGameSummary(float deltaTime);
 
 	void DrawGamePlay(BackBuffer& backBuffer);
-	void DrawSplashScreen(BackBuffer& backBuffer);
+	void DrawMainMenu(BackBuffer& backBuffer);
 	//void DrawMainMenu(BackBuffer& backBuffer);
 	//void DrawPausedMenu(BackBuffer& backBuffer);
 	//void DrawGameSummary(BackBuffer& backBuffer);
@@ -117,7 +117,7 @@ protected:
 	InputHandler* m_pInputHandler;
 
 	bool m_gamePlayLooping;
-	bool m_splashScreenLooping;
+	bool m_mainMenuLooping;
 
 	// Simulation Counters:
 	float m_elapsedSeconds;
@@ -135,8 +135,8 @@ protected:
 	Sprite* m_pEnemyBulletSprite;
 	Sprite* m_pBackgroundSprite;
 	Sprite* m_pInfoPanelSprite;
-	Sprite* m_pPlayGameInSplashScreenSprite;
-	Sprite* m_pQuitGameInSplashScreenSprite;
+	Sprite* m_pPlayGameInMainMenuSprite;
+	Sprite* m_pQuitGameInMainMenuSprite;
 	AnimatedSprite* m_pExplosionAnimatedSprite;
 
 	PlayerShip* m_pPlayerShip;
@@ -196,9 +196,10 @@ protected:
 	int m_numOfLivesLeft;
 
 	SplashScreen* m_pSplashScreen;
+	MainMenu* m_pMainMenu;
 
-	bool m_playGameMenuInSplashScreenSelected;
-	bool m_quitGameMenuInSplashScreenSelected;
+	bool m_playGameMenuInMainMenuSelected;
+	bool m_quitGameMenuInMainMenuSelected;
 
 private:
 

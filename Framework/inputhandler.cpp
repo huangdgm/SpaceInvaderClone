@@ -78,7 +78,7 @@ InputHandler::ProcessInput(Game& game)
 }
 
 void
-InputHandler::ProcessInputForSplashScreen(Game& game)
+InputHandler::ProcessInputForMainMenu(Game& game)
 {
 	SDL_Event e;
 
@@ -93,12 +93,12 @@ InputHandler::ProcessInputForSplashScreen(Game& game)
 		case SDL_JOYBUTTONDOWN:
 			if (e.jbutton.button == SDL_CONTROLLER_BUTTON_A)
 			{
-				if (game.IsPlayGameMenuInSplashScreenSelected())
+				if (game.IsPlayGameMenuInMainMenuSelected())
 				{
 					Game::sm_gameState = GAME_PLAY;
-					game.QuitSplashScreen();
+					game.QuitMainMenu();
 				}
-				else if (game.IsQuitGameMenuInSplashScreenSelected())
+				else if (game.IsQuitGameMenuInMainMenuSelected())
 				{
 					game.QuitGame();
 				}
@@ -108,22 +108,22 @@ InputHandler::ProcessInputForSplashScreen(Game& game)
 		case SDL_JOYHATMOTION:
 			if (e.jhat.value == SDL_HAT_UP)
 			{
-				game.SelectPlayGameMenuInSplashScreen();
+				game.SelectPlayGameMenuInMainMenu();
 			}
 			else if (e.jhat.value == SDL_HAT_DOWN)
 			{
-				game.SelectQuitGameMenuInSplashScreen();
+				game.SelectQuitGameMenuInMainMenu();
 			}
 
 			break;
 		case SDL_KEYDOWN:
 			if (e.key.keysym.sym == SDLK_UP)
 			{
-				game.SelectPlayGameMenuInSplashScreen();
+				game.SelectPlayGameMenuInMainMenu();
 			}
 			else if (e.key.keysym.sym == SDLK_DOWN)
 			{
-				game.SelectQuitGameMenuInSplashScreen();
+				game.SelectQuitGameMenuInMainMenu();
 			}
 
 			break;
@@ -132,7 +132,7 @@ InputHandler::ProcessInputForSplashScreen(Game& game)
 }
 
 void
-InputHandler::ProcessInputForMainMenu(Game& game)
+InputHandler::ProcessInputForSplashScreen(Game& game)
 {
 }
 

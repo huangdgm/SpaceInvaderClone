@@ -30,7 +30,7 @@ using namespace std;
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
-GameState Game::sm_gameState = SPLASH_SCREEN;
+GameState Game::sm_gameState = MAIN_MENU;
 
 Game&
 Game::GetInstance()
@@ -56,7 +56,7 @@ Game::Game()
 : m_pBackBuffer(0)
 , m_pInputHandler(0)
 , m_gamePlayLooping(true)
-, m_splashScreenLooping(true)
+, m_mainMenuLooping(true)
 , m_executionTime(0)
 , m_elapsedSeconds(0)
 , m_frameCount(0)
@@ -76,8 +76,8 @@ Game::Game()
 , m_pEnemyBulletSprite(0)
 , m_pBackgroundSprite(0)
 , m_pInfoPanelSprite(0)
-, m_pPlayGameInSplashScreenSprite(0)
-, m_pQuitGameInSplashScreenSprite(0)
+, m_pPlayGameInMainMenuSprite(0)
+, m_pQuitGameInMainMenuSprite(0)
 , m_scrollingOffset(0)
 , m_pBackgroundMusic(0)
 , m_pExplosionSoundEffect(0)
@@ -91,9 +91,9 @@ Game::Game()
 , m_pHealthTextTexture(0)
 , m_level(0)
 , m_score(0)
-, m_pSplashScreen(0)
-, m_playGameMenuInSplashScreenSelected(true)
-, m_quitGameMenuInSplashScreenSelected(false)
+, m_pMainMenu(0)
+, m_playGameMenuInMainMenuSelected(true)
+, m_quitGameMenuInMainMenuSelected(false)
 {
 	m_pEnemy = new Enemy[MAX_NUM_OF_ENEMY];
 	m_pPlayerShip = new PlayerShip[MAX_NUM_OF_PLAYER_SHIP];
@@ -130,11 +130,11 @@ Game::~Game()
 	delete m_pInfoPanelSprite;
 	m_pInfoPanelSprite = NULL;
 
-	delete m_pPlayGameInSplashScreenSprite;
-	m_pPlayGameInSplashScreenSprite = NULL;
+	delete m_pPlayGameInMainMenuSprite;
+	m_pPlayGameInMainMenuSprite = NULL;
 
-	delete m_pQuitGameInSplashScreenSprite;
-	m_pQuitGameInSplashScreenSprite = NULL;
+	delete m_pQuitGameInMainMenuSprite;
+	m_pQuitGameInMainMenuSprite = NULL;
 
 	delete[] m_pExplosionAnimatedSprite;
 	m_pExplosionAnimatedSprite = NULL;
@@ -184,8 +184,8 @@ Game::~Game()
 	delete m_pHealthTextTexture;
 	m_pHealthTextTexture = NULL;
 
-	delete m_pSplashScreen;
-	m_pSplashScreen = NULL;
+	delete m_pMainMenu;
+	m_pMainMenu = NULL;
 
 	delete m_pBackBuffer;
 	m_pBackBuffer = NULL;
@@ -213,8 +213,8 @@ Game::Initialise()
 	m_pEnemyBulletSprite = m_pBackBuffer->CreateSprite("assets\\enemybullet.png");
 	m_pBackgroundSprite = m_pBackBuffer->CreateSprite("assets\\background.png");
 	m_pInfoPanelSprite = m_pBackBuffer->CreateSprite("assets\\infopanel.png");
-	m_pPlayGameInSplashScreenSprite = m_pBackBuffer->CreateSprite("assets\\splashscreenplaygame.png");
-	m_pQuitGameInSplashScreenSprite = m_pBackBuffer->CreateSprite("assets\\splashscreenquitgame.png");
+	m_pPlayGameInMainMenuSprite = m_pBackBuffer->CreateSprite("assets\\mainmenuplaygame.png");
+	m_pQuitGameInMainMenuSprite = m_pBackBuffer->CreateSprite("assets\\mainmenuquitgame.png");
 
 	m_pPlayerSprite->SetHandleCenter();
 	m_pEnemySprite->SetHandleCenter();
@@ -227,9 +227,9 @@ Game::Initialise()
 	m_pBulletSoundEffect = Mix_LoadWAV("assets\\bullet.wav");
 	m_pHurtSoundEffect = Mix_LoadWAV("assets\\hurt.wav");
 
-	// Create the splash screen
-	m_pSplashScreen = new SplashScreen();
-	m_pSplashScreen->Initialise(m_pPlayGameInSplashScreenSprite);
+	// Create the main menu
+	m_pMainMenu = new MainMenu();
+	m_pMainMenu->Initialise(m_pPlayGameInMainMenuSprite);
 
 	// Create the player ship.
 	SpawnPlayerShip();
@@ -280,8 +280,8 @@ Game::DoGameLoop()
 	case GAME_PLAY:
 		DoGamePlayLoop();
 		break;
-	case SPLASH_SCREEN:
-		DoSplashScreenLoop();
+	case MAIN_MENU:
+		DoMainMenuLoop();
 		break;
 	}
 }
@@ -294,8 +294,8 @@ Game::Process(float deltaTime)
 	case GAME_PLAY:
 		ProcessGamePlay(deltaTime);
 		break;
-	case SPLASH_SCREEN:
-		ProcessSplashScreen(deltaTime);
+	case MAIN_MENU:
+		ProcessMainMenu(deltaTime);
 		break;
 	}
 }
@@ -308,8 +308,8 @@ Game::Draw(BackBuffer& backBuffer)
 	case GAME_PLAY:
 		DrawGamePlay(backBuffer);
 		break;
-	case SPLASH_SCREEN:
-		DrawSplashScreen(backBuffer);
+	case MAIN_MENU:
+		DrawMainMenu(backBuffer);
 		break;
 	}
 }
@@ -319,7 +319,7 @@ Game::QuitGame()
 {
 	Game::sm_gameState = GAME_QUIT;
 	m_gamePlayLooping = false;
-	m_splashScreenLooping = false;
+	m_mainMenuLooping = false;
 }
 
 void
@@ -329,9 +329,9 @@ Game::QuitGamePlay()
 }
 
 void
-Game::QuitSplashScreen()
+Game::QuitMainMenu()
 {
-	m_splashScreenLooping = false;
+	m_mainMenuLooping = false;
 }
 
 void
@@ -691,39 +691,6 @@ Game::DoGamePlayLoop()
 	return (m_gamePlayLooping);
 }
 
-//bool
-//Game::DoMainMenuLoop()
-//{
-//	return (true);
-//
-//}
-//
-//bool
-//Game::DoPausedMenuLoop()
-//{
-//	return (true);
-//
-//}
-//
-//bool
-//Game::DoGameSummaryLoop()
-//{
-//	return (true);
-//
-//}
-
-//bool
-//Game::CreateSplashScreen()
-//{
-//	SplashScreen* splashScreen = new SplashScreen();
-//
-//	splashScreen->Initialise(m_pSplashScreenSprite);
-//	splashScreen->SetPosition(0, 0);
-//
-//	return (true);
-//}
-
-
 void
 Game::ProcessGamePlay(float deltaTime)
 {
@@ -954,14 +921,14 @@ Game::DrawGamePlay(BackBuffer& backBuffer)
 }
 
 bool
-Game::DoSplashScreenLoop()
+Game::DoMainMenuLoop()
 {
 	const float STEP_SIZE = 1.0f / 60.0f;
 
 	assert(m_pInputHandler);
 	m_pInputHandler->ProcessInput(*this);
 
-	if (m_splashScreenLooping)
+	if (m_mainMenuLooping)
 	{
 		int current = SDL_GetTicks();
 		float deltaTime = (current - m_lastTime) / 1000.0f;
@@ -985,11 +952,11 @@ Game::DoSplashScreenLoop()
 
 	//	SDL_Delay(1);
 
-	return (m_splashScreenLooping);
+	return (m_mainMenuLooping);
 }
 
 void
-Game::ProcessSplashScreen(float deltaTime)
+Game::ProcessMainMenu(float deltaTime)
 {
 	// Count total simulation time elapsed:
 	m_elapsedSeconds += deltaTime;
@@ -1004,44 +971,44 @@ Game::ProcessSplashScreen(float deltaTime)
 }
 
 void
-Game::DrawSplashScreen(BackBuffer& backBuffer)
+Game::DrawMainMenu(BackBuffer& backBuffer)
 {
 	++m_frameCount;
 
 	backBuffer.Clear();
 
-	m_pSplashScreen->Draw(backBuffer);
+	m_pMainMenu->Draw(backBuffer);
 
 	// Update the screen.
 	backBuffer.Present();
 }
 
 bool
-Game::IsPlayGameMenuInSplashScreenSelected()
+Game::IsPlayGameMenuInMainMenuSelected()
 {
-	return m_playGameMenuInSplashScreenSelected;
+	return m_playGameMenuInMainMenuSelected;
 }
 
 bool
-Game::IsQuitGameMenuInSplashScreenSelected()
+Game::IsQuitGameMenuInMainMenuSelected()
 {
-	return m_quitGameMenuInSplashScreenSelected;
+	return m_quitGameMenuInMainMenuSelected;
 }
 
 void
-Game::SelectPlayGameMenuInSplashScreen()
+Game::SelectPlayGameMenuInMainMenu()
 {
-	m_pSplashScreen->SetSprite(m_pPlayGameInSplashScreenSprite);
+	m_pMainMenu->SetSprite(m_pPlayGameInMainMenuSprite);
 
-	m_playGameMenuInSplashScreenSelected = true;
-	m_quitGameMenuInSplashScreenSelected = false;
+	m_playGameMenuInMainMenuSelected = true;
+	m_quitGameMenuInMainMenuSelected = false;
 }
 
 void
-Game::SelectQuitGameMenuInSplashScreen()
+Game::SelectQuitGameMenuInMainMenu()
 {
-	m_pSplashScreen->SetSprite(m_pQuitGameInSplashScreenSprite);
+	m_pMainMenu->SetSprite(m_pQuitGameInMainMenuSprite);
 
-	m_playGameMenuInSplashScreenSelected = false;
-	m_quitGameMenuInSplashScreenSelected = true;
+	m_playGameMenuInMainMenuSelected = false;
+	m_quitGameMenuInMainMenuSelected = true;
 }

@@ -95,6 +95,7 @@
     <ClInclude Include="particle.h" />
     <ClInclude Include="particleemitter.h" />
     <ClInclude Include="playership.h" />
+    <ClInclude Include="mainmenu.h" />
     <ClInclude Include="splashscreen.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="texttexture.h" />
@@ -119,6 +120,7 @@
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="particleemitter.cpp" />
     <ClCompile Include="playership.cpp" />
+    <ClCompile Include="mainmenu.cpp" />
     <ClCompile Include="splashscreen.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="texttexture.cpp" />

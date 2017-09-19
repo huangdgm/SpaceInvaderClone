@@ -28,9 +28,3 @@ SplashScreen::Initialise(Sprite* sprite)
 
 	this->SetPosition(0, 0);
 }
-
-void
-SplashScreen::SetSprite(Sprite* sprite)
-{
-	Entity::Initialise(sprite);
-}

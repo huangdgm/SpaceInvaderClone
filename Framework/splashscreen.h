@@ -1,6 +1,6 @@
 // COMP710 GP 2D Framework 2017
-#ifndef __SPASHSCREEN_H__
-#define __SPASHSCREEN_H__
+#ifndef __SPLASHSCREEN_H__
+#define __SPLASHSCREEN_H__
 
 // Local includes:
 #include "entity.h"
@@ -14,9 +14,6 @@ public:
 
 	void Process(float deltaTime);
 	void Initialise(Sprite* sprite);
-
-	// Set the sprite for the splash screen based on the user selection.
-	void SetSprite(Sprite* sprite);
 
 protected:
 
@@ -33,4 +30,4 @@ private:
 
 };
 
-#endif //__SPASHSCREEN_H__
+#endif //__SPLASHSCREEN_H__

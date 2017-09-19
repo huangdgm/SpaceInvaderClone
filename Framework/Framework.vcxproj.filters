@@ -78,6 +78,9 @@
     <ClInclude Include="gamestate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="mainmenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="splashscreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -141,6 +144,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="playerbullet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mainmenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="splashscreen.cpp">
