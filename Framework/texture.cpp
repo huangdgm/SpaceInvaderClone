@@ -38,7 +38,7 @@ Texture::Initialise(const char* pcFilename, SDL_Renderer* pRenderer)
 	}
 	else
 	{
-		// Dong: Make 'white color' transparent in the pSurface.
+		// Make 'white color' transparent in the pSurface.
 		SDL_SetColorKey(pSurface, SDL_TRUE, SDL_MapRGB(pSurface->format, 0xFF, 0xFF, 0xFF));
 
 		m_pTexture = SDL_CreateTextureFromSurface(m_pRenderer, pSurface);

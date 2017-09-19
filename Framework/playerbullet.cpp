@@ -5,13 +5,8 @@
 
 // Local includes:
 #include "sprite.h"
-#include "backbuffer.h"
 
 // Library includes:
-#include <cassert>
-#include <Windows.h>
-#include <XInput.h>
-#include <iostream>
 
 PlayerBullet::PlayerBullet()
 : Entity()
@@ -37,7 +32,6 @@ PlayerBullet::Initialise(Sprite* sprite)
 void
 PlayerBullet::Process(float deltaTime)
 {
-	// Ensure the process method chains-up to the super class process method.
 	Entity::Process(deltaTime);
 
 	if (m_y <= m_pSprite->GetHeight() * (-1))

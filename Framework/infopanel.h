@@ -3,7 +3,6 @@
 #define __INFOPANEL_H__
 
 #include "entity.h"
-//#include "SDL_ttf.h"
 
 #include <string>
 

@@ -4,7 +4,6 @@
 
 // Local includes:
 #include "entity.h"
-#include "weapontype.h"
 
 class SplashScreen : public Entity
 {
@@ -16,6 +15,7 @@ public:
 	void Process(float deltaTime);
 	void Initialise(Sprite* sprite);
 
+	// Set the sprite for the splash screen based on the user selection.
 	void SetSprite(Sprite* sprite);
 
 protected:

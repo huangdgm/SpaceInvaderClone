@@ -21,7 +21,7 @@ public:
 	void SetDead(bool dead);
 	bool IsDead() const;
 
-	bool IsCollidingWith(Entity& e);	// Not IsCollidingWith(const Entity& e), because the method may change the entity e.
+	bool IsCollidingWith(Entity& e);
 
 	void SetPosition(float x, float y);
 	void SetPositionX(float x);

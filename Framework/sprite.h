@@ -30,7 +30,7 @@ public:
 	float GetAngle() const;
 
 	void SetCenter(int x, int y);
-	void SetHandleCenter();		// What does this method do?
+	void SetHandleCenter();
 
 	int GetWidth() const;
 	int GetHeight() const;
@@ -38,7 +38,7 @@ public:
 	int GetCenterX() const;
 	int GetCenterY() const;
 
-	Texture* GetTexture();	// dong: no SetTexture() method
+	Texture* GetTexture();
 
 protected:
 

@@ -14,7 +14,7 @@ public:
 protected:
 
 private:
-	LogManager();	// Set the default constructor private will make the LogManager of singleton characteristic.
+	LogManager();
 	LogManager(const LogManager& logManager);
 	LogManager& operator=(const LogManager& logManager);
 

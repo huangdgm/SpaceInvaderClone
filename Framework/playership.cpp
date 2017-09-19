@@ -17,7 +17,6 @@ class Game;
 #include <XInput.h>
 #include <iostream>
 
-// Ensure the constructor chains-up to the super class constructor.
 PlayerShip::PlayerShip()
 : Entity()
 , m_health(100)
@@ -38,7 +37,6 @@ PlayerShip::Initialise(Sprite* sprite)
 
 	m_dead = false;
 
-	// Dong: Set the initial position(384, 568) for the playership.
 	float positionX = (Game::WIDTH_OF_PLAYING_PANEL - m_pSprite->GetWidth()) / 2.0f;
 	float positionY = (Game::HEIGHT_OF_PLAYING_PANEL - m_pSprite->GetHeight()) * 1.0f;
 

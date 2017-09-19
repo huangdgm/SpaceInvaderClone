@@ -35,6 +35,7 @@ public:
 
 	bool Initialise();
 	void DoGameLoop();
+
 	void QuitGame();
 	void QuitGamePlay();
 	void QuitSplashScreen();

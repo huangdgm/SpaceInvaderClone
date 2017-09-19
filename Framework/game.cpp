@@ -800,7 +800,7 @@ Game::ProcessGamePlay(float deltaTime)
 		}
 	}
 
-	if (rand() % 100 > 95)
+	if (rand() % 100 > 92)
 	{
 		SpawnEnemyBullet();
 	}
@@ -868,8 +868,6 @@ Game::ProcessGamePlay(float deltaTime)
 	m_pLivesTextTexture->LoadFromRenderedText(to_string(m_numOfLivesLeft), *m_pFontColor);
 	// Todo: create the GetCurrentPlayerShip() method.
 	m_pHealthTextTexture->LoadFromRenderedText(to_string((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetHealth()), *m_pFontColor);
-
-	// W03.3: Remove any dead explosions from the container...
 }
 
 void

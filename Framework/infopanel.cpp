@@ -4,17 +4,12 @@
 #include "infopanel.h"
 
 // Local includes:
-#include "sprite.h"
-#include "backbuffer.h"
 #include "game.h"
-#include "logmanager.h"
 
 // Library includes:
-#include <cassert>
-#include <Windows.h>
-#include <SDL_ttf.h>
 
-// Ensure the constructor chains-up to the super class constructor.
+class Sprite;
+
 InfoPanel::InfoPanel()
 : Entity()
 {
@@ -40,8 +35,5 @@ InfoPanel::Initialise(Sprite* sprite)
 void
 InfoPanel::Process(float deltaTime)
 {
-	// Ensure the process method chains-up to the super class process method.
 	Entity::Process(deltaTime);
-
-	// dong: no need to perform boundary check, as the position doesn't change
 }

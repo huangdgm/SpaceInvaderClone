@@ -141,8 +141,6 @@ InputHandler::ProcessInputForGamePlay(Game& game)
 {
 	SDL_Event e;
 
-	// Loop until there are no events left in the event queue.
-	// The SDL_PollEvent() function takes a pointer to an SDL_Event structure that is to be filled with event information.
 	while (SDL_PollEvent(&e) != 0)
 	{
 		switch (e.type)
