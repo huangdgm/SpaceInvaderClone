@@ -1,8 +1,7 @@
-﻿Build started 9/21/2017 10:59:58 AM.
+﻿Build started 9/21/2017 11:10:49 AM.
      1>Project "C:\Users\xfn\Desktop\SpaceInvaderClone\Framework\Framework.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2-2.0.5\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_mixer-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_image-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_ttf-2.0.14\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt animatedsprite.cpp backbuffer.cpp boss.cpp gamesummary.cpp playerbullet.cpp enemy.cpp enemybullet.cpp entity.cpp explosion.cpp game.cpp infopanel.cpp inputhandler.cpp logmanager.cpp main.cpp particle.cpp particleemitter.cpp playership.cpp mainmenu.cpp splashscreen.cpp sprite.cpp texttexture.cpp texture.cpp texturemanager.cpp vector2d.cpp
-         vector2d.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2-2.0.5\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_mixer-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_image-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_ttf-2.0.14\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt animatedsprite.cpp backbuffer.cpp boss.cpp gamesummary.cpp playerbullet.cpp enemy.cpp enemybullet.cpp entity.cpp explosion.cpp game.cpp infopanel.cpp inputhandler.cpp logmanager.cpp main.cpp playership.cpp mainmenu.cpp splashscreen.cpp sprite.cpp texttexture.cpp texture.cpp texturemanager.cpp
          texturemanager.cpp
          texture.cpp
          texttexture.cpp
@@ -10,8 +9,6 @@
          splashscreen.cpp
          mainmenu.cpp
          playership.cpp
-         particleemitter.cpp
-         particle.cpp
          main.cpp
          logmanager.cpp
          inputhandler.cpp
@@ -22,11 +19,11 @@
          enemybullet.cpp
          enemy.cpp
          playerbullet.cpp
-         Generating Code...
-         Compiling...
          gamesummary.cpp
          boss.cpp
          backbuffer.cpp
+         Generating Code...
+         Compiling...
          animatedsprite.cpp
          Generating Code...
        Link:
@@ -44,8 +41,6 @@
          Debug\inputhandler.obj
          Debug\logmanager.obj
          Debug\main.obj
-         Debug\particle.obj
-         Debug\particleemitter.obj
          Debug\playership.obj
          Debug\mainmenu.obj
          Debug\splashscreen.obj
@@ -53,10 +48,9 @@
          Debug\texttexture.obj
          Debug\texture.obj
          Debug\texturemanager.obj
-         Debug\vector2d.obj
          Framework.vcxproj -> C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\Framework.exe
      1>Done Building Project "C:\Users\xfn\Desktop\SpaceInvaderClone\Framework\Framework.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:10.51
+Time Elapsed 00:00:11.06

@@ -103,6 +103,8 @@ Game::Game()
 
 Game::~Game()
 {
+	ReleaseGamePlay();
+
 	delete m_pInputHandler;
 	m_pInputHandler = NULL;
 
@@ -139,24 +141,6 @@ Game::~Game()
 	delete m_pGameSummarySprite;
 	m_pGameSummarySprite = NULL;
 
-	delete[] m_pEnemy;
-	m_pEnemy = NULL;
-
-	delete[] m_pPlayerShip;
-	m_pPlayerShip = NULL;
-
-	delete[] m_pPlayerBullet;
-	m_pPlayerBullet = NULL;
-
-	delete[] m_pEnemyBullet;
-	m_pEnemyBullet = NULL;
-
-	delete[] m_pExplosion;
-	m_pExplosion = NULL;
-
-	delete[] m_pExplosionAnimatedSprite;
-	m_pExplosionAnimatedSprite = NULL;
-
 	Mix_FreeMusic(m_pBackgroundMusic);
 	m_pBackgroundMusic = NULL;
 
@@ -186,12 +170,6 @@ Game::~Game()
 
 	delete m_pHealthTextTexture;
 	m_pHealthTextTexture = NULL;
-
-	delete m_pBoss;
-	m_pBoss = NULL;
-
-	delete m_pInfoPanel;
-	m_pInfoPanel = NULL;
 
 	delete m_pSplashScreen;
 	m_pSplashScreen = NULL;
@@ -1187,6 +1165,8 @@ Game::GenericLoop(bool looping)
 void
 Game::ResetGamePlay()
 {
+	ReleaseGamePlay();
+
 	m_splashScreenLooping = true;
 	m_mainMenuLooping = true;
 	m_gamePlayLooping = true;
@@ -1205,6 +1185,49 @@ Game::ResetGamePlay()
 	m_score = 0;
 	m_numOfLivesLeft = MAX_NUM_OF_PLAYER_SHIP - 1;
 
+	m_pInfoPanel = 0;
+	m_pBoss = 0;
+
+	m_pEnemy = new Enemy[MAX_NUM_OF_ENEMY];
+	m_pPlayerShip = new PlayerShip[MAX_NUM_OF_PLAYER_SHIP];
+	m_pPlayerBullet = new PlayerBullet[MAX_NUM_OF_PLAYER_BULLETS];
+	m_pEnemyBullet = new EnemyBullet[MAX_NUM_OF_ENEMY_BULLETS];
+	m_pExplosion = new Explosion[MAX_NUM_OF_EXPLOSIONS];
+	m_pExplosionAnimatedSprite = new AnimatedSprite[MAX_NUM_OF_EXPLOSIONS];
+}
+
+void
+Game::InitialiseGamePlay()
+{
+	// Create the player ship.
+	SpawnPlayerShip();
+
+	// Create the enemies.
+	for (int i = 0; i < MAX_NUM_OF_ENEMY; i++)
+	{
+		int positionX = rand() % (WIDTH_OF_PLAYING_PANEL - m_pEnemySprite->GetWidth());
+		int positionY = rand() % (LEVEL_TIME_DURATION * AVERAGE_VELOCITY_OF_ENEMY) * (-1);
+
+		SpawnEnemy(positionX, positionY);
+	}
+
+	// Create the boss enemy.
+	float positionX = ((WIDTH_OF_PLAYING_PANEL / 2) - m_pBossSprite->GetCenterX()) * 1.0f;
+	float positionY = LEVEL_TIME_DURATION * AVERAGE_VELOCITY_OF_ENEMY * (-1.0f);
+	m_pBoss = new Boss();
+	m_pBoss->Initialise(m_pBossSprite);
+	m_pBoss->SetPosition(positionX, positionY);
+	m_pBoss->SetHorizontalVelocity(0.0f);
+	m_pBoss->SetVerticalVelocity(AVERAGE_VELOCITY_OF_ENEMY * 1.0f);
+
+	// Create the info panel.
+	m_pInfoPanel = new InfoPanel();
+	m_pInfoPanel->Initialise(m_pInfoPanelSprite);
+}
+
+void
+Game::ReleaseGamePlay()
+{
 	if (m_pInfoPanel != NULL)
 	{
 		delete m_pInfoPanel;
@@ -1252,43 +1275,5 @@ Game::ResetGamePlay()
 		delete[] m_pExplosionAnimatedSprite;
 		m_pExplosionAnimatedSprite = NULL;
 	}
-
-	m_pInfoPanel = 0;
-	m_pBoss = 0;
-
-	m_pEnemy = new Enemy[MAX_NUM_OF_ENEMY];
-	m_pPlayerShip = new PlayerShip[MAX_NUM_OF_PLAYER_SHIP];
-	m_pPlayerBullet = new PlayerBullet[MAX_NUM_OF_PLAYER_BULLETS];
-	m_pEnemyBullet = new EnemyBullet[MAX_NUM_OF_ENEMY_BULLETS];
-	m_pExplosion = new Explosion[MAX_NUM_OF_EXPLOSIONS];
-	m_pExplosionAnimatedSprite = new AnimatedSprite[MAX_NUM_OF_EXPLOSIONS];
 }
 
-void
-Game::InitialiseGamePlay()
-{
-	// Create the player ship.
-	SpawnPlayerShip();
-
-	// Create the enemies.
-	for (int i = 0; i < MAX_NUM_OF_ENEMY; i++)
-	{
-		int positionX = rand() % (WIDTH_OF_PLAYING_PANEL - m_pEnemySprite->GetWidth());
-		int positionY = rand() % (LEVEL_TIME_DURATION * AVERAGE_VELOCITY_OF_ENEMY) * (-1);
-
-		SpawnEnemy(positionX, positionY);
-	}
-
-	// Create the boss enemy.
-	float positionX = ((WIDTH_OF_PLAYING_PANEL / 2) - m_pBossSprite->GetCenterX()) * 1.0f;
-	float positionY = LEVEL_TIME_DURATION * AVERAGE_VELOCITY_OF_ENEMY * (-1.0f);
-	m_pBoss = new Boss();
-	m_pBoss->Initialise(m_pBossSprite);
-	m_pBoss->SetPosition(positionX, positionY);
-	m_pBoss->SetHorizontalVelocity(0.0f);
-	m_pBoss->SetVerticalVelocity(AVERAGE_VELOCITY_OF_ENEMY * 1.0f);
-
-	// Create the info panel.
-	m_pInfoPanel = new InfoPanel();
-	m_pInfoPanel->Initialise(m_pInfoPanelSprite);
-}

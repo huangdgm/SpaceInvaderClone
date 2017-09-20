@@ -79,6 +79,7 @@ private:
 
 	void ResetGamePlay();
 	void InitialiseGamePlay();
+	void ReleaseGamePlay();
 
 	void UpdateElapsedSecondsAndFrameCount(float deltaTime);
 
@@ -91,19 +92,16 @@ private:
 	void DoSplashScreenLoop(bool mainMenuLooping);
 	void DoMainMenuLoop(bool splashScreenLooping);
 	void DoGameSummaryLoop(bool gameSummaryLooping);
-	//bool DoPausedMenuLoop();
 
 	void ProcessGamePlay(float deltaTime);
 	void ProcessSplashScreen(float deltaTime);
 	void ProcessMainMenu(float deltaTime);
 	void ProcessGameSummary(float deltaTime);
-	//void ProcessPausedMenu(float deltaTime);
 
 	void DrawGamePlay(BackBuffer& backBuffer);
 	void DrawSplashScreen(BackBuffer& backBuffer);
 	void DrawMainMenu(BackBuffer& backBuffer);
 	void DrawGameSummary(BackBuffer& backBuffer);
-	//void DrawPausedMenu(BackBuffer& backBuffer);
 
 	//Member Data:
 public:
