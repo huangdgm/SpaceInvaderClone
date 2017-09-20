@@ -91,20 +91,21 @@ Game::Game()
 , m_pLevelTextTexture(0)
 , m_pLivesTextTexture(0)
 , m_pHealthTextTexture(0)
-, m_level(0)
+, m_level(1)
 , m_score(0)
-, m_pSplashScreen(0)
-, m_pMainMenu(0)
 , m_playGameMenuInMainMenuSelected(true)
 , m_quitGameMenuInMainMenuSelected(false)
+, m_pSplashScreen(0)
+, m_pMainMenu(0)
 {
+	m_numOfLivesLeft = MAX_NUM_OF_PLAYER_SHIP - 1;
+	
 	m_pEnemy = new Enemy[MAX_NUM_OF_ENEMY];
 	m_pPlayerShip = new PlayerShip[MAX_NUM_OF_PLAYER_SHIP];
 	m_pPlayerBullet = new PlayerBullet[MAX_NUM_OF_PLAYER_BULLETS];
 	m_pEnemyBullet = new EnemyBullet[MAX_NUM_OF_ENEMY_BULLETS];
 	m_pExplosion = new Explosion[MAX_NUM_OF_EXPLOSIONS];
 	m_pExplosionAnimatedSprite = new AnimatedSprite[MAX_NUM_OF_EXPLOSIONS];
-	m_numOfLivesLeft = MAX_NUM_OF_PLAYER_SHIP - 1;
 }
 
 Game::~Game()
@@ -196,6 +197,7 @@ Game::~Game()
 	delete m_pMainMenu;
 	m_pMainMenu = NULL;
 
+	// Delete the backbuffer at the end.
 	delete m_pBackBuffer;
 	m_pBackBuffer = NULL;
 }
@@ -203,16 +205,12 @@ Game::~Game()
 bool
 Game::Initialise()
 {
-	// Create the back buffer.
+	m_lastTime = SDL_GetTicks();
+	m_lag = 0.0f;
+
 	CreateBackBuffer();
-
-	// Create the input handler.
 	CreateInputHandler();
-
-	// Create the TTF font.
 	CreateTTFFont();
-
-	// Create the font color.
 	CreateFontColor(255, 255, 255);
 
 	// Load sprite.
@@ -226,6 +224,7 @@ Game::Initialise()
 	m_pQuitGameInMainMenuSprite = m_pBackBuffer->CreateSprite("assets\\mainmenuquitgame.png");
 	m_pSplashScreenSprite = m_pBackBuffer->CreateSprite("assets\\splashscreen.png");
 
+	// Set handle center.
 	m_pPlayerSprite->SetHandleCenter();
 	m_pEnemySprite->SetHandleCenter();
 	m_pPlayerBulletSprite->SetHandleCenter();
@@ -260,9 +259,6 @@ Game::Initialise()
 	// Create the info panel.
 	m_pInfoPanel = new InfoPanel();
 	m_pInfoPanel->Initialise(m_pInfoPanelSprite);
-
-	m_lastTime = SDL_GetTicks();
-	m_lag = 0.0f;
 
 	// Play background music.
 	Mix_PlayMusic(m_pBackgroundMusic, -1);
@@ -409,34 +405,37 @@ Game::MoveSpaceShipDown()
 void
 Game::FireSpaceShipBullet()
 {
-	PlayerBullet* bullet = m_pPlayerBullet;
-
-	if (m_indexOfPlayerBullet < MAX_NUM_OF_PLAYER_BULLETS)
+	if (!((m_pPlayerShip + m_indexOfPlayerShip - 1)->IsDead()))
 	{
-		bullet = m_pPlayerBullet + m_indexOfPlayerBullet;
-		m_indexOfPlayerBullet++;
+		PlayerBullet* bullet = m_pPlayerBullet;
+
+		if (m_indexOfPlayerBullet < MAX_NUM_OF_PLAYER_BULLETS)
+		{
+			bullet = m_pPlayerBullet + m_indexOfPlayerBullet;
+			m_indexOfPlayerBullet++;
+		}
+		else
+		{
+			// To limit the the number of bullets.
+			m_indexOfPlayerBullet = 0;
+		}
+
+		assert(bullet);
+
+		if (bullet->Initialise(m_pPlayerBulletSprite))
+		{
+			float positionX = ((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetPositionX() + (m_pPlayerSprite->GetWidth() - m_pPlayerBulletSprite->GetWidth()) / 2) * 1.0f;
+			float positionY = ((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetPositionY() - m_pPlayerBulletSprite->GetHeight()) * 1.0f;
+
+			bullet->SetPositionX(positionX);
+			bullet->SetPositionY(positionY);
+
+			bullet->SetVerticalVelocity(VELOCITY_OF_PLAYER_BULLET * 1.0f);
+		}
+
+		// Play the bullet sound effect.
+		Mix_PlayChannel(-1, m_pBulletSoundEffect, 0);
 	}
-	else
-	{
-		// To limit the the number of bullets.
-		m_indexOfPlayerBullet = 0;
-	}
-
-	assert(bullet);
-
-	if (bullet->Initialise(m_pPlayerBulletSprite))
-	{
-		float positionX = ((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetPositionX() + (m_pPlayerSprite->GetWidth() - m_pPlayerBulletSprite->GetWidth()) / 2) * 1.0f;
-		float positionY = ((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetPositionY() - m_pPlayerBulletSprite->GetHeight()) * 1.0f;
-
-		bullet->SetPositionX(positionX);
-		bullet->SetPositionY(positionY);
-
-		bullet->SetVerticalVelocity(VELOCITY_OF_PLAYER_BULLET * 1.0f);
-	}
-
-	// Play the bullet sound effect.
-	Mix_PlayChannel(-1, m_pBulletSoundEffect, 0);
 }
 
 void
@@ -481,10 +480,10 @@ Game::SpawnPlayerShip()
 		playerShip = m_pPlayerShip + m_indexOfPlayerShip;
 		m_indexOfPlayerShip++;
 	}
-	else
-	{
-		m_indexOfPlayerShip = 0;
-	}
+	//else
+	//{
+	//	m_indexOfPlayerShip = 0;
+	//}
 
 	assert(playerShip);
 

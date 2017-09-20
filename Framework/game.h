@@ -139,17 +139,19 @@ protected:
 	Sprite* m_pPlayGameInMainMenuSprite;
 	Sprite* m_pQuitGameInMainMenuSprite;
 	Sprite* m_pSplashScreenSprite;
+
 	AnimatedSprite* m_pExplosionAnimatedSprite;
 
-	PlayerShip* m_pPlayerShip;
-	Enemy* m_pEnemy;
-	PlayerBullet* m_pPlayerBullet;
-	EnemyBullet* m_pEnemyBullet;
-	Explosion* m_pExplosion;
-	InfoPanel* m_pInfoPanel;
-	SplashScreen* m_pSplashScreen;
-	MainMenu* m_pMainMenu;
+	PlayerShip*		m_pPlayerShip;
+	Enemy*			m_pEnemy;
+	PlayerBullet*	m_pPlayerBullet;
+	EnemyBullet*	m_pEnemyBullet;
+	Explosion*		m_pExplosion;
+	InfoPanel*		m_pInfoPanel;
+	SplashScreen*	m_pSplashScreen;
+	MainMenu*		m_pMainMenu;
 
+	// Configuration of the game.
 	const static int MAX_NUM_OF_ENEMY = 100;
 	const static int MAX_NUM_OF_PLAYER_SHIP = 3;
 
@@ -174,6 +176,7 @@ protected:
 	int m_indexOfExplosion;
 	int m_indexOfExplosionAnimatedSprite;
 
+	// The offset for the scrolling background.
 	int m_scrollingOffset;
 
 	// Background music.
@@ -186,7 +189,6 @@ protected:
 
 	TTF_Font* m_pFont;
 
-	// The color for the font.
 	SDL_Color* m_pFontColor;
 
 	// The score text texture.
@@ -195,6 +197,7 @@ protected:
 	TextTexture* m_pLivesTextTexture;
 	TextTexture* m_pHealthTextTexture;
 
+	// Information shown in the info panel.
 	int m_level;
 	int m_score;
 	int m_numOfLivesLeft;

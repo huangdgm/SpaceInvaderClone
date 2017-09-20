@@ -181,10 +181,7 @@ InputHandler::ProcessInputForGamePlay(Game& game)
 		case SDL_JOYBUTTONDOWN:
 			if (e.jbutton.button == SDL_CONTROLLER_BUTTON_A)
 			{
-				if (game.HasMoreLives())
-				{
-					game.FireSpaceShipBullet();
-				}
+				game.FireSpaceShipBullet();
 			}
 
 			break;
