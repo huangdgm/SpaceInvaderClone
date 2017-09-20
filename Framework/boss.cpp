@@ -12,7 +12,7 @@
 
 Boss::Boss()
 : Enemy()
-, m_health(500)
+, m_health(1000)
 , m_weaponType(TRIPLE_BULLET)
 {
 

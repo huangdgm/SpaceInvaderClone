@@ -1014,14 +1014,14 @@ Game::DrawGamePlay(BackBuffer& backBuffer)
 	// To make the scrolling slower, the m_scrollingOffset is divided by 60.
 	m_scrollingOffset++;
 
-	if ((m_scrollingOffset / 60) > m_pBackgroundSprite->GetHeight())
+	if ((m_scrollingOffset / 30) > m_pBackgroundSprite->GetHeight())
 	{
 		m_scrollingOffset = 0;
 	}
 
 	if (m_pBackgroundSprite)
 	{
-		m_pBackgroundSprite->DrawScrollingBackground(backBuffer, m_scrollingOffset / 60);
+		m_pBackgroundSprite->DrawScrollingBackground(backBuffer, m_scrollingOffset / 30);
 	}
 
 	// Draw the info panel
