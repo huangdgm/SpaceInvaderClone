@@ -84,6 +84,9 @@
     <ClInclude Include="splashscreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="boss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="backbuffer.cpp">
@@ -150,6 +153,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="splashscreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="boss.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

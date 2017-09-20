@@ -62,8 +62,8 @@ Entity::IsCollidingWith(Entity& e)
 	double distance = 0.0;
 	bool isCollid = false;
 
-	double radiusOfThis = sqrt(pow(this->m_pSprite->GetHeight(), 2)) / 2;
-	double radiusOfE = sqrt(pow(e.m_pSprite->GetHeight(), 2) * 2) / 2;
+	double radiusOfThis = this->m_pSprite->GetHeight() / sqrt(2);
+	double radiusOfE = e.m_pSprite->GetHeight() / sqrt(2);
 	
 	distance = sqrt(pow((e.GetPositionX() - this->GetPositionX()), 2) + pow((e.GetPositionY() - this->GetPositionY()), 2));
 

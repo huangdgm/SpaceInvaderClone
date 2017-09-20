@@ -2,6 +2,8 @@
 
 // The background.wav music is owned by Jan125 from:
 // https://opengameart.org/content/stereotypical-90s-space-shooter-music
+// The boss sprite is owned by Skorpio from:
+// https://opengameart.org/content/spaceship-fighter
 
 // Library includes:
 #include <SDL.h>

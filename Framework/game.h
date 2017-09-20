@@ -4,6 +4,7 @@
 
 // Local includes:
 #include "enemy.h"
+#include "boss.h"
 #include "playerbullet.h"
 #include "enemybullet.h"
 #include "animatedsprite.h"
@@ -53,6 +54,7 @@ public:
 	void SpawnEnemy(int x, int y);
 	void SpawnPlayerShip();
 	void SpawnEnemyBullet();
+	void SpawnBossBullet();
 	void SpawnExplosion(float x, float y);
 
 	bool HasMoreLives();
@@ -134,6 +136,7 @@ protected:
 	bool m_drawDebugInfo;
 
 	Sprite* m_pEnemySprite;
+	Sprite* m_pBossSprite;
 	Sprite* m_pPlayerSprite;
 	Sprite* m_pPlayerBulletSprite;
 	Sprite* m_pEnemyBulletSprite;
@@ -147,6 +150,7 @@ protected:
 
 	PlayerShip*		m_pPlayerShip;
 	Enemy*			m_pEnemy;
+	Boss*			m_pBoss;
 	PlayerBullet*	m_pPlayerBullet;
 	EnemyBullet*	m_pEnemyBullet;
 	Explosion*		m_pExplosion;
@@ -159,17 +163,19 @@ protected:
 	const static int MAX_NUM_OF_PLAYER_SHIP = 3;
 
 	const static int MAX_NUM_OF_PLAYER_BULLETS = 50;
-	const static int MAX_NUM_OF_ENEMY_BULLETS = 50;
+	const static int MAX_NUM_OF_ENEMY_BULLETS = 100;
 	const static int MAX_NUM_OF_EXPLOSIONS = 100;
 	const static int MAX_NUM_OF_ANIMATEDSPRITE = 100;
 
 	const static int VELOCITY_OF_PLAYER_BULLET = -800;
 	const static int VELOCITY_OF_ENEMY_BULLET = 200;
 	const static int VELOCITY_OF_PLAYERSHIP = 400;
+	const static int VELOCITY_OF_BOSS = 100;
 	const static int AVERAGE_VELOCITY_OF_ENEMY = 120;
 	const static int STANDARD_DEVIATION_VELOCITY_OF_ENEMY = 40;
 
 	const static int DAMAGE_CAUSED_BY_ENEMY_BULLET = 34;
+	const static int DAMAGE_CAUSED_BY_PLAYERSHIP_BULLET = 20;
 	const static int LEVEL_TIME_DURATION = 30;
 
 	int m_indexOfPlayerBullet;

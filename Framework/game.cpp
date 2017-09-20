@@ -12,6 +12,7 @@
 #include "playerbullet.h"
 #include "enemybullet.h"
 #include "enemy.h"
+#include "boss.h"
 #include "explosion.h"
 #include "infopanel.h"
 #include "texttexture.h"
@@ -72,6 +73,7 @@ Game::Game()
 , m_indexOfExplosion(0)
 , m_indexOfExplosionAnimatedSprite(0)
 , m_pEnemySprite(0)
+, m_pBossSprite(0)
 , m_pPlayerSprite(0)
 , m_pPlayerBulletSprite(0)
 , m_pEnemyBulletSprite(0)
@@ -95,11 +97,12 @@ Game::Game()
 , m_score(0)
 , m_playGameMenuInMainMenuSelected(true)
 , m_quitGameMenuInMainMenuSelected(false)
+, m_pBoss(0)
 , m_pSplashScreen(0)
 , m_pMainMenu(0)
 {
 	m_numOfLivesLeft = MAX_NUM_OF_PLAYER_SHIP - 1;
-	
+
 	m_pEnemy = new Enemy[MAX_NUM_OF_ENEMY];
 	m_pPlayerShip = new PlayerShip[MAX_NUM_OF_PLAYER_SHIP];
 	m_pPlayerBullet = new PlayerBullet[MAX_NUM_OF_PLAYER_BULLETS];
@@ -118,6 +121,9 @@ Game::~Game()
 
 	delete m_pEnemySprite;
 	m_pEnemySprite = NULL;
+
+	delete m_pBossSprite;
+	m_pBossSprite = NULL;
 
 	delete m_pPlayerSprite;
 	m_pPlayerSprite = NULL;
@@ -191,9 +197,12 @@ Game::~Game()
 	delete m_pHealthTextTexture;
 	m_pHealthTextTexture = NULL;
 
+	delete m_pBoss;
+	m_pBoss = NULL;
+
 	delete m_pSplashScreen;
-	m_pSplashScreen = NULL; 
-	
+	m_pSplashScreen = NULL;
+
 	delete m_pMainMenu;
 	m_pMainMenu = NULL;
 
@@ -216,6 +225,7 @@ Game::Initialise()
 	// Load sprite.
 	m_pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\playership.png");
 	m_pEnemySprite = m_pBackBuffer->CreateSprite("assets\\alienenemy.png");
+	m_pBossSprite = m_pBackBuffer->CreateSprite("assets\\boss.png");
 	m_pPlayerBulletSprite = m_pBackBuffer->CreateSprite("assets\\playerbullet.png");
 	m_pEnemyBulletSprite = m_pBackBuffer->CreateSprite("assets\\enemybullet.png");
 	m_pBackgroundSprite = m_pBackBuffer->CreateSprite("assets\\background.png");
@@ -227,6 +237,7 @@ Game::Initialise()
 	// Set handle center.
 	m_pPlayerSprite->SetHandleCenter();
 	m_pEnemySprite->SetHandleCenter();
+	m_pBossSprite->SetHandleCenter();
 	m_pPlayerBulletSprite->SetHandleCenter();
 	m_pEnemyBulletSprite->SetHandleCenter();
 
@@ -255,6 +266,15 @@ Game::Initialise()
 
 		SpawnEnemy(positionX, positionY);
 	}
+
+	// Create the boss enemy.
+	float positionX = ((WIDTH_OF_PLAYING_PANEL / 2) - m_pBossSprite->GetCenterX()) * 1.0f;
+	float positionY = LEVEL_TIME_DURATION * AVERAGE_VELOCITY_OF_ENEMY * (-1.0f);
+	m_pBoss = new Boss();
+	m_pBoss->Initialise(m_pBossSprite);
+	m_pBoss->SetPosition(positionX, positionY);
+	m_pBoss->SetHorizontalVelocity(0.0f);
+	m_pBoss->SetVerticalVelocity(AVERAGE_VELOCITY_OF_ENEMY * 1.0f);
 
 	// Create the info panel.
 	m_pInfoPanel = new InfoPanel();
@@ -287,14 +307,14 @@ Game::DoGameLoop()
 {
 	switch (sm_gameState)
 	{
-	case GAME_PLAY:
-		DoGamePlayLoop(m_gamePlayLooping);
-		break;
 	case SPLASH_SCREEN:
 		DoSplashScreenLoop(m_splashScreenLooping);
 		break;
 	case MAIN_MENU:
 		DoMainMenuLoop(m_mainMenuLooping);
+		break;
+	case GAME_PLAY:
+		DoGamePlayLoop(m_gamePlayLooping);
 		break;
 	}
 }
@@ -304,14 +324,14 @@ Game::Process(float deltaTime)
 {
 	switch (sm_gameState)
 	{
-	case GAME_PLAY:
-		ProcessGamePlay(deltaTime);
-		break;
 	case SPLASH_SCREEN:
 		ProcessSplashScreen(deltaTime);
 		break;
 	case MAIN_MENU:
 		ProcessMainMenu(deltaTime);
+		break;
+	case GAME_PLAY:
+		ProcessGamePlay(deltaTime);
 		break;
 	}
 }
@@ -321,14 +341,14 @@ Game::Draw(BackBuffer& backBuffer)
 {
 	switch (sm_gameState)
 	{
-	case GAME_PLAY:
-		DrawGamePlay(backBuffer);
-		break;
 	case SPLASH_SCREEN:
 		DrawSplashScreen(backBuffer);
 		break;
 	case MAIN_MENU:
 		DrawMainMenu(backBuffer);
+		break;
+	case GAME_PLAY:
+		DrawGamePlay(backBuffer);
 		break;
 	}
 }
@@ -546,6 +566,45 @@ Game::SpawnEnemyBullet()
 }
 
 void
+Game::SpawnBossBullet()
+{
+	EnemyBullet* enemyBullet = m_pEnemyBullet;
+
+	if (m_indexOfEnemyBullet < MAX_NUM_OF_ENEMY_BULLETS)
+	{
+		enemyBullet = m_pEnemyBullet + m_indexOfEnemyBullet;
+		m_indexOfEnemyBullet++;
+	}
+	else
+	{
+		m_indexOfEnemyBullet = 0;
+	}
+
+	if (rand() % 100 > 90 && !(m_pBoss->IsDead()) && m_pBoss->GetPositionY() >= 0)
+	{
+		enemyBullet->Initialise(m_pEnemyBulletSprite);
+
+		float positionX = (m_pBoss->GetPositionX() + m_pBossSprite->GetWidth() / 2) * 1.0f;
+		float positionY = (m_pBoss->GetPositionY() + m_pBossSprite->GetHeight()) * 1.0f;
+
+		enemyBullet->SetPositionX(positionX);
+		enemyBullet->SetPositionY(positionY);
+
+		enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET);
+
+		if (rand() % 2 == 0)
+		{
+			enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * (rand() % 100) * 0.01f);
+		}
+		else
+		{
+			enemyBullet->SetHorizontalVelocity(VELOCITY_OF_ENEMY_BULLET * (rand() % 100) * (-0.01f));
+		}
+	}
+}
+
+
+void
 Game::SpawnExplosion(float x, float y)
 {
 	Explosion* explosion = m_pExplosion;
@@ -696,6 +755,29 @@ Game::ProcessGamePlay(float deltaTime)
 		}
 	}
 
+	// Process the boss.
+	if (!(m_pBoss->IsDead()))
+	{
+		if (m_pBoss->GetPositionY() >= 100)
+		{
+			m_pBoss->SetVerticalVelocity(0.0f);
+
+			if (rand() % 100 > 98)
+			{
+				if (rand() % 2 == 0)
+				{
+					m_pBoss->SetHorizontalVelocity(VELOCITY_OF_BOSS * 1.0f);
+				}
+				else
+				{
+					m_pBoss->SetHorizontalVelocity(VELOCITY_OF_BOSS * (-1.0f));
+				}
+			}
+		}
+
+		m_pBoss->Process(deltaTime);
+	}
+
 	// Process the player bullets.
 	for (PlayerBullet* playerBullet = m_pPlayerBullet; playerBullet < m_pPlayerBullet + MAX_NUM_OF_PLAYER_BULLETS; playerBullet++)
 	{
@@ -750,9 +832,42 @@ Game::ProcessGamePlay(float deltaTime)
 		}
 	}
 
+	// Check for the collisions between the boss and the player bullets.
+	for (PlayerBullet* bullet = m_pPlayerBullet; bullet < m_pPlayerBullet + MAX_NUM_OF_PLAYER_BULLETS; bullet++)
+	{
+		if (!(m_pBoss->IsDead()) && !(bullet->IsDead()))
+		{
+			if (bullet->IsCollidingWith(*m_pBoss))
+			{
+				m_score += 10;
+
+				m_pBoss->SetHealth(m_pBoss->GetHealth() - DAMAGE_CAUSED_BY_PLAYERSHIP_BULLET);
+				bullet->SetDead(true);
+
+				if (m_pBoss->GetHealth() <= 0)
+				{
+					float x = (m_pBoss->GetPositionX() + bullet->GetPositionX() + m_pBossSprite->GetCenterX() + m_pPlayerBulletSprite->GetCenterX()) / 2;
+					float y = (m_pBoss->GetPositionY() + bullet->GetPositionY() + m_pBossSprite->GetCenterY() + m_pPlayerBulletSprite->GetCenterY()) / 2;
+
+					m_pBoss->SetDead(true);
+					SpawnExplosion(x, y);
+				}
+
+				// Play the explosion sound effect.
+				Mix_PlayChannel(-1, m_pExplosionSoundEffect, 0);
+			}
+		}
+	}
+
+
 	if (rand() % 100 > 92)
 	{
 		SpawnEnemyBullet();
+	}
+
+	if (rand() % 100 > 5)
+	{
+		SpawnBossBullet();
 	}
 
 	// Check for the collisions between the player ship and the enemy bullets.
@@ -878,6 +993,12 @@ Game::DrawGamePlay(BackBuffer& backBuffer)
 		}
 	}
 
+	// Draw the boss
+	if (!(m_pBoss->IsDead()))
+	{
+		m_pBoss->Draw(backBuffer);
+	}
+
 	// Draw the player bullets.
 	for (PlayerBullet* playerBullet = m_pPlayerBullet; playerBullet < m_pPlayerBullet + MAX_NUM_OF_PLAYER_BULLETS; playerBullet++)
 	{
@@ -966,6 +1087,7 @@ Game::UpdatePlayerShip(PlayerShip* playerShip)
 	if (playerShip->GetHealth() - DAMAGE_CAUSED_BY_ENEMY_BULLET <= 0)
 	{
 		playerShip->SetDead(true);
+
 		// Spawn explosion when the player ship dies.
 		SpawnExplosion(playerShip->GetPositionX(), playerShip->GetPositionY());
 

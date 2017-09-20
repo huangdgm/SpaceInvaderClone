@@ -9,10 +9,7 @@
 #include "game.h"
 
 // Library includes:
-#include <cassert>
-#include <Windows.h>
 
-// Ensure the constructor chains-up to the super class constructor.
 Enemy::Enemy()
 : Entity()
 {
@@ -41,7 +38,7 @@ Enemy::Process(float deltaTime)
 	Entity::Process(deltaTime);
 
 	// Horizontal boundary checking and position capping.
-	if (m_x < 0 || m_x > Game::WIDTH_OF_PLAYING_PANEL)
+	if (m_x < m_pSprite->GetWidth() * (-1.0f) || m_x > Game::WIDTH_OF_PLAYING_PANEL)
 	{
 		m_dead = true;
 	}
