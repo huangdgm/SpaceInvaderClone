@@ -61,7 +61,7 @@ BackBuffer::Initialise(int width, int height)
 	}
 	else
 	{
-		m_pWindow = SDL_CreateWindow("Space Invader", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+		m_pWindow = SDL_CreateWindow("Space Explorer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
 
 		if (m_pWindow == 0)
 		{

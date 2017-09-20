@@ -77,6 +77,9 @@ private:
 	Game& operator=(const Game& game);
 	Game();
 
+	void ResetGamePlay();
+	void InitialiseGamePlay();
+
 	void UpdateElapsedSecondsAndFrameCount(float deltaTime);
 
 	bool CreateBackBuffer();

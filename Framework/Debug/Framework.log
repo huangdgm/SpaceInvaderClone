@@ -1,15 +1,30 @@
-﻿Build started 9/21/2017 10:14:33 AM.
+﻿Build started 9/21/2017 10:59:58 AM.
      1>Project "C:\Users\xfn\Desktop\SpaceInvaderClone\Framework\Framework.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2-2.0.5\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_mixer-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_image-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_ttf-2.0.14\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt animatedsprite.cpp backbuffer.cpp boss.cpp enemy.cpp enemybullet.cpp explosion.cpp game.cpp infopanel.cpp inputhandler.cpp main.cpp playership.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2-2.0.5\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_mixer-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_image-2.0.1\include" /I"C:\Users\xfn\Desktop\SpaceInvaderClone\\SDL\SDL2_ttf-2.0.14\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt animatedsprite.cpp backbuffer.cpp boss.cpp gamesummary.cpp playerbullet.cpp enemy.cpp enemybullet.cpp entity.cpp explosion.cpp game.cpp infopanel.cpp inputhandler.cpp logmanager.cpp main.cpp particle.cpp particleemitter.cpp playership.cpp mainmenu.cpp splashscreen.cpp sprite.cpp texttexture.cpp texture.cpp texturemanager.cpp vector2d.cpp
+         vector2d.cpp
+         texturemanager.cpp
+         texture.cpp
+         texttexture.cpp
+         sprite.cpp
+         splashscreen.cpp
+         mainmenu.cpp
          playership.cpp
+         particleemitter.cpp
+         particle.cpp
          main.cpp
+         logmanager.cpp
          inputhandler.cpp
          infopanel.cpp
          game.cpp
          explosion.cpp
+         entity.cpp
          enemybullet.cpp
          enemy.cpp
+         playerbullet.cpp
+         Generating Code...
+         Compiling...
+         gamesummary.cpp
          boss.cpp
          backbuffer.cpp
          animatedsprite.cpp
@@ -39,23 +54,9 @@
          Debug\texture.obj
          Debug\texturemanager.obj
          Debug\vector2d.obj
-         LINK : C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\Framework.exe not found or not built by the last incremental link; performing full link
-     1>vector2d.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'vector2d.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>texturemanager.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'texturemanager.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>texture.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'texture.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>texttexture.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'texttexture.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>sprite.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'sprite.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>splashscreen.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'splashscreen.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>mainmenu.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'mainmenu.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>particleemitter.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'particleemitter.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>particle.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'particle.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>logmanager.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'logmanager.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>entity.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'entity.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>playerbullet.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'playerbullet.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
-     1>gamesummary.obj : warning LNK4099: PDB 'vc120.pdb' was not found with 'gamesummary.obj' or at 'C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\vc120.pdb'; linking object as if no debug info
          Framework.vcxproj -> C:\Users\xfn\Desktop\SpaceInvaderClone\Debug\Framework.exe
      1>Done Building Project "C:\Users\xfn\Desktop\SpaceInvaderClone\Framework\Framework.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:07.85
+Time Elapsed 00:00:10.51
