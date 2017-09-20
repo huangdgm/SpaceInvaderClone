@@ -67,16 +67,15 @@ protected:
 	void Process(float deltaTime);
 	void Draw(BackBuffer& backBuffer);
 
+private:
+	Game(const Game& game);
+	Game& operator=(const Game& game);
+	Game();
+
 	bool CreateBackBuffer();
 	bool CreateInputHandler();
 	bool CreateTTFFont();
 	bool CreateFontColor(Uint8 r, Uint8 g, Uint8 b);
-
-private:
-	Game(const Game& game);
-	Game& operator=(const Game& game);
-	
-	Game();
 
 	bool DoGamePlayLoop();
 	bool DoSplashScreenLoop();

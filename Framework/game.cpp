@@ -666,6 +666,10 @@ Game::UpdatePlayerShip(PlayerShip* playerShip)
 {
 	if (playerShip->GetHealth() - DAMAGE_CAUSED_BY_ENEMY_BULLET <= 0)
 	{
+		playerShip->SetDead(true);
+		// Spawn explosion when the player ship dies.
+		SpawnExplosion(playerShip->GetPositionX(), playerShip->GetPositionY());
+
 		if (HasMoreLives())
 		{
 			--m_numOfLivesLeft;
@@ -676,10 +680,6 @@ Game::UpdatePlayerShip(PlayerShip* playerShip)
 			//QuitGamePlay();
 			//Game::sm_gameState = GAME_SUMMARY;
 		}
-
-		playerShip->SetDead(true);
-		// Spawn explosion when the player ship dies.
-		SpawnExplosion(playerShip->GetPositionX(), playerShip->GetPositionY());
 	}
 	else
 	{
