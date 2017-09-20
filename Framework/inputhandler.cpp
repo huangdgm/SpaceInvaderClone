@@ -125,6 +125,18 @@ InputHandler::ProcessInputForMainMenu(Game& game)
 			{
 				game.SelectQuitGameMenuInMainMenu();
 			}
+			else if (e.key.keysym.sym == SDLK_SPACE)
+			{
+				if (game.IsPlayGameMenuInMainMenuSelected())
+				{
+					Game::sm_gameState = GAME_PLAY;
+					game.QuitMainMenu();
+				}
+				else if (game.IsQuitGameMenuInMainMenuSelected())
+				{
+					game.QuitGame();
+				}
+			}
 
 			break;
 		}
@@ -134,6 +146,23 @@ InputHandler::ProcessInputForMainMenu(Game& game)
 void
 InputHandler::ProcessInputForSplashScreen(Game& game)
 {
+	SDL_Event e;
+
+	while (SDL_PollEvent(&e) != 0)
+	{
+		switch (e.type)
+		{
+		case SDL_QUIT:
+			game.QuitGame();
+
+			break;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYHATMOTION:
+		case SDL_KEYDOWN:
+			game.QuitSplashScreen();
+			Game::sm_gameState = MAIN_MENU;
+		}
+	}
 }
 
 void

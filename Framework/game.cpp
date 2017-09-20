@@ -30,7 +30,7 @@ using namespace std;
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
-GameState Game::sm_gameState = MAIN_MENU;
+GameState Game::sm_gameState = SPLASH_SCREEN;
 
 Game&
 Game::GetInstance()
@@ -56,6 +56,7 @@ Game::Game()
 : m_pBackBuffer(0)
 , m_pInputHandler(0)
 , m_gamePlayLooping(true)
+, m_splashScreenLooping(true)
 , m_mainMenuLooping(true)
 , m_executionTime(0)
 , m_elapsedSeconds(0)
@@ -78,6 +79,7 @@ Game::Game()
 , m_pInfoPanelSprite(0)
 , m_pPlayGameInMainMenuSprite(0)
 , m_pQuitGameInMainMenuSprite(0)
+, m_pSplashScreenSprite(0)
 , m_scrollingOffset(0)
 , m_pBackgroundMusic(0)
 , m_pExplosionSoundEffect(0)
@@ -91,6 +93,7 @@ Game::Game()
 , m_pHealthTextTexture(0)
 , m_level(0)
 , m_score(0)
+, m_pSplashScreen(0)
 , m_pMainMenu(0)
 , m_playGameMenuInMainMenuSelected(true)
 , m_quitGameMenuInMainMenuSelected(false)
@@ -135,6 +138,9 @@ Game::~Game()
 
 	delete m_pQuitGameInMainMenuSprite;
 	m_pQuitGameInMainMenuSprite = NULL;
+
+	delete m_pSplashScreenSprite;
+	m_pSplashScreenSprite = NULL;
 
 	delete[] m_pExplosionAnimatedSprite;
 	m_pExplosionAnimatedSprite = NULL;
@@ -184,6 +190,9 @@ Game::~Game()
 	delete m_pHealthTextTexture;
 	m_pHealthTextTexture = NULL;
 
+	delete m_pSplashScreen;
+	m_pSplashScreen = NULL; 
+	
 	delete m_pMainMenu;
 	m_pMainMenu = NULL;
 
@@ -215,6 +224,7 @@ Game::Initialise()
 	m_pInfoPanelSprite = m_pBackBuffer->CreateSprite("assets\\infopanel.png");
 	m_pPlayGameInMainMenuSprite = m_pBackBuffer->CreateSprite("assets\\mainmenuplaygame.png");
 	m_pQuitGameInMainMenuSprite = m_pBackBuffer->CreateSprite("assets\\mainmenuquitgame.png");
+	m_pSplashScreenSprite = m_pBackBuffer->CreateSprite("assets\\splashscreen.png");
 
 	m_pPlayerSprite->SetHandleCenter();
 	m_pEnemySprite->SetHandleCenter();
@@ -226,6 +236,10 @@ Game::Initialise()
 	m_pExplosionSoundEffect = Mix_LoadWAV("assets\\explosion.wav");
 	m_pBulletSoundEffect = Mix_LoadWAV("assets\\bullet.wav");
 	m_pHurtSoundEffect = Mix_LoadWAV("assets\\hurt.wav");
+
+	// Create the main menu
+	m_pSplashScreen = new SplashScreen();
+	m_pSplashScreen->Initialise(m_pSplashScreenSprite);
 
 	// Create the main menu
 	m_pMainMenu = new MainMenu();
@@ -280,6 +294,9 @@ Game::DoGameLoop()
 	case GAME_PLAY:
 		DoGamePlayLoop();
 		break;
+	case SPLASH_SCREEN:
+		DoSplashScreenLoop();
+		break;
 	case MAIN_MENU:
 		DoMainMenuLoop();
 		break;
@@ -293,6 +310,9 @@ Game::Process(float deltaTime)
 	{
 	case GAME_PLAY:
 		ProcessGamePlay(deltaTime);
+		break;
+	case SPLASH_SCREEN:
+		ProcessSplashScreen(deltaTime);
 		break;
 	case MAIN_MENU:
 		ProcessMainMenu(deltaTime);
@@ -308,6 +328,9 @@ Game::Draw(BackBuffer& backBuffer)
 	case GAME_PLAY:
 		DrawGamePlay(backBuffer);
 		break;
+	case SPLASH_SCREEN:
+		DrawSplashScreen(backBuffer);
+		break;
 	case MAIN_MENU:
 		DrawMainMenu(backBuffer);
 		break;
@@ -318,7 +341,21 @@ void
 Game::QuitGame()
 {
 	Game::sm_gameState = GAME_QUIT;
+
+	m_splashScreenLooping = false;
+	m_mainMenuLooping = false;
 	m_gamePlayLooping = false;
+}
+
+void
+Game::QuitSplashScreen()
+{
+	m_splashScreenLooping = false;
+}
+
+void
+Game::QuitMainMenu()
+{
 	m_mainMenuLooping = false;
 }
 
@@ -326,12 +363,6 @@ void
 Game::QuitGamePlay()
 {
 	m_gamePlayLooping = false;
-}
-
-void
-Game::QuitMainMenu()
-{
-	m_mainMenuLooping = false;
 }
 
 void
@@ -978,6 +1009,69 @@ Game::DrawMainMenu(BackBuffer& backBuffer)
 	backBuffer.Clear();
 
 	m_pMainMenu->Draw(backBuffer);
+
+	// Update the screen.
+	backBuffer.Present();
+}
+
+bool
+Game::DoSplashScreenLoop()
+{
+	const float STEP_SIZE = 1.0f / 60.0f;
+
+	assert(m_pInputHandler);
+	m_pInputHandler->ProcessInput(*this);
+
+	if (m_splashScreenLooping)
+	{
+		int current = SDL_GetTicks();
+		float deltaTime = (current - m_lastTime) / 1000.0f;
+		m_lastTime = current;
+
+		m_executionTime += deltaTime;
+
+		m_lag += deltaTime;
+
+		while (m_lag >= STEP_SIZE)
+		{
+			Process(STEP_SIZE);
+
+			m_lag -= STEP_SIZE;
+
+			++m_numUpdates;
+		}
+
+		Draw(*m_pBackBuffer);
+	}
+
+	//	SDL_Delay(1);
+
+	return (m_splashScreenLooping);
+}
+
+void
+Game::ProcessSplashScreen(float deltaTime)
+{
+	// Count total simulation time elapsed:
+	m_elapsedSeconds += deltaTime;
+
+	// Frame Counter:
+	if (m_elapsedSeconds > 1)
+	{
+		m_elapsedSeconds -= 1;
+		m_FPS = m_frameCount;
+		m_frameCount = 0;
+	}
+}
+
+void
+Game::DrawSplashScreen(BackBuffer& backBuffer)
+{
+	++m_frameCount;
+
+	backBuffer.Clear();
+
+	m_pSplashScreen->Draw(backBuffer);
 
 	// Update the screen.
 	backBuffer.Present();

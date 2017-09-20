@@ -38,6 +38,7 @@ public:
 	void DoGameLoop();
 
 	void QuitGame();
+	void QuitSplashScreen();
 	void QuitMainMenu();
 	void QuitGamePlay();
 
@@ -78,20 +79,20 @@ private:
 	Game();
 
 	bool DoGamePlayLoop();
+	bool DoSplashScreenLoop();
 	bool DoMainMenuLoop();
-	//bool DoMainMenuLoop();
 	//bool DoPausedMenuLoop();
 	//bool DoGameSummaryLoop();
 
 	void ProcessGamePlay(float deltaTime);
+	void ProcessSplashScreen(float deltaTime);
 	void ProcessMainMenu(float deltaTime);
-	//void ProcessMainMenu(float deltaTime);
 	//void ProcessPausedMenu(float deltaTime);
 	//void ProcessGameSummary(float deltaTime);
 
 	void DrawGamePlay(BackBuffer& backBuffer);
+	void DrawSplashScreen(BackBuffer& backBuffer);
 	void DrawMainMenu(BackBuffer& backBuffer);
-	//void DrawMainMenu(BackBuffer& backBuffer);
 	//void DrawPausedMenu(BackBuffer& backBuffer);
 	//void DrawGameSummary(BackBuffer& backBuffer);
 
@@ -118,6 +119,7 @@ protected:
 
 	bool m_gamePlayLooping;
 	bool m_mainMenuLooping;
+	bool m_splashScreenLooping;
 
 	// Simulation Counters:
 	float m_elapsedSeconds;
@@ -137,6 +139,7 @@ protected:
 	Sprite* m_pInfoPanelSprite;
 	Sprite* m_pPlayGameInMainMenuSprite;
 	Sprite* m_pQuitGameInMainMenuSprite;
+	Sprite* m_pSplashScreenSprite;
 	AnimatedSprite* m_pExplosionAnimatedSprite;
 
 	PlayerShip* m_pPlayerShip;
@@ -145,6 +148,8 @@ protected:
 	EnemyBullet* m_pEnemyBullet;
 	Explosion* m_pExplosion;
 	InfoPanel* m_pInfoPanel;
+	SplashScreen* m_pSplashScreen;
+	MainMenu* m_pMainMenu;
 
 	const static int MAX_NUM_OF_ENEMY = 100;
 	const static int MAX_NUM_OF_PLAYER_SHIP = 3;
@@ -194,9 +199,6 @@ protected:
 	int m_level;
 	int m_score;
 	int m_numOfLivesLeft;
-
-	SplashScreen* m_pSplashScreen;
-	MainMenu* m_pMainMenu;
 
 	bool m_playGameMenuInMainMenuSelected;
 	bool m_quitGameMenuInMainMenuSelected;
