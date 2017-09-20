@@ -85,6 +85,7 @@
     <ClInclude Include="boss.h" />
     <ClInclude Include="enemybullet.h" />
     <ClInclude Include="gamestate.h" />
+    <ClInclude Include="gamesummary.h" />
     <ClInclude Include="playerbullet.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="entity.h" />
@@ -109,6 +110,7 @@
     <ClCompile Include="animatedsprite.cpp" />
     <ClCompile Include="backbuffer.cpp" />
     <ClCompile Include="boss.cpp" />
+    <ClCompile Include="gamesummary.cpp" />
     <ClCompile Include="playerbullet.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="enemybullet.cpp" />

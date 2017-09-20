@@ -68,9 +68,6 @@ InputHandler::ProcessInput(Game& game)
 	case GAME_PLAY:
 		ProcessInputForGamePlay(game);
 		break;
-	case PAUSED_MENU:
-		ProcessInputForPausedMenu(game);
-		break;
 	case GAME_SUMMARY:
 		ProcessInputForGameSummary(game);
 		break;
@@ -240,12 +237,33 @@ InputHandler::ProcessInputForGamePlay(Game& game)
 }
 
 void
-InputHandler::ProcessInputForPausedMenu(Game& game)
-{
-}
-
-void
 InputHandler::ProcessInputForGameSummary(Game& game)
 {
-}
+	SDL_Event e;
 
+	while (SDL_PollEvent(&e) != 0)
+	{
+		switch (e.type)
+		{
+		case SDL_QUIT:
+			game.QuitGame();
+
+			break;
+		case SDL_JOYBUTTONDOWN:
+			if (e.jbutton.button == SDL_CONTROLLER_BUTTON_Y)
+			{
+				game.QuitGameSummary();
+				Game::sm_gameState = MAIN_MENU;
+			}
+
+			break;
+		case SDL_JOYHATMOTION:
+		case SDL_KEYDOWN:
+			if (e.key.keysym.sym == SDLK_SPACE)
+			{
+				game.QuitGameSummary();
+				Game::sm_gameState = MAIN_MENU;
+			}
+		}
+	}
+}

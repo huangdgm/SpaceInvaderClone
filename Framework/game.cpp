@@ -56,9 +56,10 @@ Game::DestroyInstance()
 Game::Game()
 : m_pBackBuffer(0)
 , m_pInputHandler(0)
-, m_gamePlayLooping(true)
 , m_splashScreenLooping(true)
 , m_mainMenuLooping(true)
+, m_gamePlayLooping(true)
+, m_gameSummaryLooping(true)
 , m_executionTime(0)
 , m_elapsedSeconds(0)
 , m_frameCount(0)
@@ -82,6 +83,7 @@ Game::Game()
 , m_pPlayGameInMainMenuSprite(0)
 , m_pQuitGameInMainMenuSprite(0)
 , m_pSplashScreenSprite(0)
+, m_pGameSummarySprite(0)
 , m_scrollingOffset(0)
 , m_pBackgroundMusic(0)
 , m_pExplosionSoundEffect(0)
@@ -100,6 +102,7 @@ Game::Game()
 , m_pBoss(0)
 , m_pSplashScreen(0)
 , m_pMainMenu(0)
+, m_pGameSummary(0)
 {
 	m_numOfLivesLeft = MAX_NUM_OF_PLAYER_SHIP - 1;
 
@@ -148,6 +151,9 @@ Game::~Game()
 
 	delete m_pSplashScreenSprite;
 	m_pSplashScreenSprite = NULL;
+
+	delete m_pGameSummarySprite;
+	m_pGameSummarySprite = NULL;
 
 	delete[] m_pExplosionAnimatedSprite;
 	m_pExplosionAnimatedSprite = NULL;
@@ -206,6 +212,9 @@ Game::~Game()
 	delete m_pMainMenu;
 	m_pMainMenu = NULL;
 
+	delete m_pGameSummary;
+	m_pGameSummary = NULL;
+
 	// Delete the backbuffer at the end.
 	delete m_pBackBuffer;
 	m_pBackBuffer = NULL;
@@ -233,6 +242,7 @@ Game::Initialise()
 	m_pPlayGameInMainMenuSprite = m_pBackBuffer->CreateSprite("assets\\mainmenuplaygame.png");
 	m_pQuitGameInMainMenuSprite = m_pBackBuffer->CreateSprite("assets\\mainmenuquitgame.png");
 	m_pSplashScreenSprite = m_pBackBuffer->CreateSprite("assets\\splashscreen.png");
+	m_pGameSummarySprite = m_pBackBuffer->CreateSprite("assets\\gamesummary.png");
 
 	// Set handle center.
 	m_pPlayerSprite->SetHandleCenter();
@@ -247,13 +257,17 @@ Game::Initialise()
 	m_pBulletSoundEffect = Mix_LoadWAV("assets\\bullet.wav");
 	m_pHurtSoundEffect = Mix_LoadWAV("assets\\hurt.wav");
 
-	// Create the main menu
+	// Create the splash screen
 	m_pSplashScreen = new SplashScreen();
 	m_pSplashScreen->Initialise(m_pSplashScreenSprite);
 
 	// Create the main menu
 	m_pMainMenu = new MainMenu();
 	m_pMainMenu->Initialise(m_pPlayGameInMainMenuSprite);
+
+	// Create the game summary
+	m_pGameSummary = new GameSummary();
+	m_pGameSummary->Initialise(m_pGameSummarySprite);
 
 	// Create the player ship.
 	SpawnPlayerShip();
@@ -316,6 +330,9 @@ Game::DoGameLoop()
 	case GAME_PLAY:
 		DoGamePlayLoop(m_gamePlayLooping);
 		break;
+	case GAME_SUMMARY:
+		DoGameSummaryLoop(m_gameSummaryLooping);
+		break;
 	}
 }
 
@@ -332,6 +349,9 @@ Game::Process(float deltaTime)
 		break;
 	case GAME_PLAY:
 		ProcessGamePlay(deltaTime);
+		break;
+	case GAME_SUMMARY:
+		ProcessGameSummary(deltaTime);
 		break;
 	}
 }
@@ -350,6 +370,9 @@ Game::Draw(BackBuffer& backBuffer)
 	case GAME_PLAY:
 		DrawGamePlay(backBuffer);
 		break;
+	case GAME_SUMMARY:
+		DrawGameSummary(backBuffer);
+		break;
 	}
 }
 
@@ -361,24 +384,35 @@ Game::QuitGame()
 	m_splashScreenLooping = false;
 	m_mainMenuLooping = false;
 	m_gamePlayLooping = false;
+	m_gameSummaryLooping = false;
 }
 
 void
 Game::QuitSplashScreen()
 {
 	m_splashScreenLooping = false;
+	m_mainMenuLooping = true;
 }
 
 void
 Game::QuitMainMenu()
 {
 	m_mainMenuLooping = false;
+	m_gamePlayLooping = true;
 }
 
 void
 Game::QuitGamePlay()
 {
 	m_gamePlayLooping = false;
+	m_gameSummaryLooping = true;
+}
+
+void
+Game::QuitGameSummary()
+{
+	m_gameSummaryLooping = false;
+	m_mainMenuLooping = true;
 }
 
 void
@@ -590,7 +624,7 @@ Game::SpawnBossBullet()
 		enemyBullet->SetPositionX(positionX);
 		enemyBullet->SetPositionY(positionY);
 
-		enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET);
+		enemyBullet->SetVerticalVelocity(VELOCITY_OF_ENEMY_BULLET * 1.0f);
 
 		if (rand() % 2 == 0)
 		{
@@ -718,6 +752,12 @@ void
 Game::DoGamePlayLoop(bool gamePlayLooping)
 {
 	GenericLoop(gamePlayLooping);
+}
+
+void
+Game::DoGameSummaryLoop(bool gameSummaryLooping)
+{
+	GenericLoop(gameSummaryLooping);
 }
 
 void
@@ -936,6 +976,12 @@ Game::ProcessGamePlay(float deltaTime)
 }
 
 void
+Game::ProcessGameSummary(float deltaTime)
+{
+	UpdateElapsedSecondsAndFrameCount(deltaTime);
+}
+
+void
 Game::DrawSplashScreen(BackBuffer& backBuffer)
 {
 	++m_frameCount;
@@ -1036,12 +1082,23 @@ Game::DrawGamePlay(BackBuffer& backBuffer)
 	}
 
 	// Draw the text texture.
-	m_pScoreTextTexture->Render(690, 60);
-	m_pLevelTextTexture->Render(700, 250);
-	m_pLivesTextTexture->Render(736, 410);
-	m_pHealthTextTexture->Render(665, 580);
+	m_pScoreTextTexture->Render(SCORE_POSITION_X, SCORE_POSITION_Y);
+	m_pLevelTextTexture->Render(LEVEL_POSITION_X, LEVEL_POSITION_Y);
+	m_pLivesTextTexture->Render(LIVES_POSITION_X, LIVES_POSITION_Y);
+	m_pHealthTextTexture->Render(HEALTH_POSITION_X, HEALTH_POSITION_Y);
 
 	// Update the screen.
+	backBuffer.Present();
+}
+
+void
+Game::DrawGameSummary(BackBuffer& backBuffer)
+{
+	++m_frameCount;
+	backBuffer.Clear();
+
+	m_pGameSummary->Draw(backBuffer);
+
 	backBuffer.Present();
 }
 
@@ -1098,8 +1155,8 @@ Game::UpdatePlayerShip(PlayerShip* playerShip)
 		}
 		else
 		{
-			//QuitGamePlay();
-			//Game::sm_gameState = GAME_SUMMARY;
+			QuitGamePlay();
+			Game::sm_gameState = GAME_SUMMARY;
 		}
 	}
 	else

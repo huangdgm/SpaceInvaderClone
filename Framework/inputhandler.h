@@ -22,7 +22,6 @@ public:
 	void ProcessInputForSplashScreen(Game& game);
 	void ProcessInputForMainMenu(Game& game);
 	void ProcessInputForGamePlay(Game& game);
-	void ProcessInputForPausedMenu(Game& game);
 	void ProcessInputForGameSummary(Game& game);
 
 protected:
