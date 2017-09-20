@@ -288,13 +288,13 @@ Game::DoGameLoop()
 	switch (sm_gameState)
 	{
 	case GAME_PLAY:
-		DoGamePlayLoop();
+		DoGamePlayLoop(m_gamePlayLooping);
 		break;
 	case SPLASH_SCREEN:
-		DoSplashScreenLoop();
+		DoSplashScreenLoop(m_splashScreenLooping);
 		break;
 	case MAIN_MENU:
-		DoMainMenuLoop();
+		DoMainMenuLoop(m_mainMenuLooping);
 		break;
 	}
 }
@@ -453,8 +453,6 @@ Game::SpawnEnemy(int x, int y)
 		m_indexOfEnemy = 0;
 	}
 
-	assert(enemy);
-	
 	if (enemy->Initialise(m_pEnemySprite))
 	{
 		enemy->SetPosition(x * 1.0f, y * 1.0f);
@@ -480,12 +478,6 @@ Game::SpawnPlayerShip()
 		playerShip = m_pPlayerShip + m_indexOfPlayerShip;
 		m_indexOfPlayerShip++;
 	}
-	//else
-	//{
-	//	m_indexOfPlayerShip = 0;
-	//}
-
-	assert(playerShip);
 
 	if (playerShip->Initialise(m_pPlayerSprite))
 	{
@@ -508,7 +500,6 @@ Game::SpawnEnemyBullet()
 	}
 	else
 	{
-		// To limit the the number of bullets.
 		m_indexOfEnemyBullet = 0;
 	}
 
@@ -582,8 +573,6 @@ Game::SpawnExplosion(float x, float y)
 
 	explosionAnimatedSprite = m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png");
 
-	assert(explosion);
-
 	// Each explosion has a separate explosion animated sprite.
 	if (explosion->Initialise(explosionAnimatedSprite))
 	{
@@ -654,71 +643,34 @@ Game::CreateFontColor(Uint8 r, Uint8 g, Uint8 b)
 	return (true);
 }
 
-bool
-Game::HasMoreLives()
+void
+Game::DoSplashScreenLoop(bool splashScreenLooping)
 {
-	return (m_numOfLivesLeft >= 1);
+	GenericLoop(splashScreenLooping);
 }
 
 void
-Game::UpdatePlayerShip(PlayerShip* playerShip)
+Game::DoMainMenuLoop(bool mainMenuLooping)
 {
-	if (playerShip->GetHealth() - DAMAGE_CAUSED_BY_ENEMY_BULLET <= 0)
-	{
-		playerShip->SetDead(true);
-		// Spawn explosion when the player ship dies.
-		SpawnExplosion(playerShip->GetPositionX(), playerShip->GetPositionY());
-
-		if (HasMoreLives())
-		{
-			--m_numOfLivesLeft;
-			SpawnPlayerShip();
-		}
-		else
-		{
-			//QuitGamePlay();
-			//Game::sm_gameState = GAME_SUMMARY;
-		}
-	}
-	else
-	{
-		playerShip->SetHealth(playerShip->GetHealth() - DAMAGE_CAUSED_BY_ENEMY_BULLET);
-	}
+	GenericLoop(mainMenuLooping);
 }
 
-bool
-Game::DoGamePlayLoop()
+void
+Game::DoGamePlayLoop(bool gamePlayLooping)
 {
-	const float STEP_SIZE = 1.0f / 60.0f;
+	GenericLoop(gamePlayLooping);
+}
 
-	assert(m_pInputHandler);
-	m_pInputHandler->ProcessInput(*this);
+void
+Game::ProcessSplashScreen(float deltaTime)
+{
+	UpdateElapsedSecondsAndFrameCount(deltaTime);
+}
 
-	if (m_gamePlayLooping)
-	{
-		int current = SDL_GetTicks();
-		float deltaTime = (current - m_lastTime) / 1000.0f;
-		m_lastTime = current;
-
-		m_executionTime += deltaTime;
-
-		m_lag += deltaTime;
-
-		while (m_lag >= STEP_SIZE)
-		{
-			Process(STEP_SIZE);
-
-			m_lag -= STEP_SIZE;
-
-			++m_numUpdates;
-		}
-
-		Draw(*m_pBackBuffer);
-	}
-
-	//	SDL_Delay(1);
-
-	return (m_gamePlayLooping);
+void
+Game::ProcessMainMenu(float deltaTime)
+{
+	UpdateElapsedSecondsAndFrameCount(deltaTime);
 }
 
 void
@@ -869,6 +821,28 @@ Game::ProcessGamePlay(float deltaTime)
 }
 
 void
+Game::DrawSplashScreen(BackBuffer& backBuffer)
+{
+	++m_frameCount;
+	backBuffer.Clear();
+
+	m_pSplashScreen->Draw(backBuffer);
+
+	backBuffer.Present();
+}
+
+void
+Game::DrawMainMenu(BackBuffer& backBuffer)
+{
+	++m_frameCount;
+	backBuffer.Clear();
+
+	m_pMainMenu->Draw(backBuffer);
+
+	backBuffer.Present();
+}
+
+void
 Game::DrawGamePlay(BackBuffer& backBuffer)
 {
 	++m_frameCount;
@@ -951,132 +925,6 @@ Game::DrawGamePlay(BackBuffer& backBuffer)
 }
 
 bool
-Game::DoMainMenuLoop()
-{
-	const float STEP_SIZE = 1.0f / 60.0f;
-
-	assert(m_pInputHandler);
-	m_pInputHandler->ProcessInput(*this);
-
-	if (m_mainMenuLooping)
-	{
-		int current = SDL_GetTicks();
-		float deltaTime = (current - m_lastTime) / 1000.0f;
-		m_lastTime = current;
-
-		m_executionTime += deltaTime;
-
-		m_lag += deltaTime;
-
-		while (m_lag >= STEP_SIZE)
-		{
-			Process(STEP_SIZE);
-
-			m_lag -= STEP_SIZE;
-
-			++m_numUpdates;
-		}
-
-		Draw(*m_pBackBuffer);
-	}
-
-	//	SDL_Delay(1);
-
-	return (m_mainMenuLooping);
-}
-
-void
-Game::ProcessMainMenu(float deltaTime)
-{
-	// Count total simulation time elapsed:
-	m_elapsedSeconds += deltaTime;
-
-	// Frame Counter:
-	if (m_elapsedSeconds > 1)
-	{
-		m_elapsedSeconds -= 1;
-		m_FPS = m_frameCount;
-		m_frameCount = 0;
-	}
-}
-
-void
-Game::DrawMainMenu(BackBuffer& backBuffer)
-{
-	++m_frameCount;
-
-	backBuffer.Clear();
-
-	m_pMainMenu->Draw(backBuffer);
-
-	// Update the screen.
-	backBuffer.Present();
-}
-
-bool
-Game::DoSplashScreenLoop()
-{
-	const float STEP_SIZE = 1.0f / 60.0f;
-
-	assert(m_pInputHandler);
-	m_pInputHandler->ProcessInput(*this);
-
-	if (m_splashScreenLooping)
-	{
-		int current = SDL_GetTicks();
-		float deltaTime = (current - m_lastTime) / 1000.0f;
-		m_lastTime = current;
-
-		m_executionTime += deltaTime;
-
-		m_lag += deltaTime;
-
-		while (m_lag >= STEP_SIZE)
-		{
-			Process(STEP_SIZE);
-
-			m_lag -= STEP_SIZE;
-
-			++m_numUpdates;
-		}
-
-		Draw(*m_pBackBuffer);
-	}
-
-	//	SDL_Delay(1);
-
-	return (m_splashScreenLooping);
-}
-
-void
-Game::ProcessSplashScreen(float deltaTime)
-{
-	// Count total simulation time elapsed:
-	m_elapsedSeconds += deltaTime;
-
-	// Frame Counter:
-	if (m_elapsedSeconds > 1)
-	{
-		m_elapsedSeconds -= 1;
-		m_FPS = m_frameCount;
-		m_frameCount = 0;
-	}
-}
-
-void
-Game::DrawSplashScreen(BackBuffer& backBuffer)
-{
-	++m_frameCount;
-
-	backBuffer.Clear();
-
-	m_pSplashScreen->Draw(backBuffer);
-
-	// Update the screen.
-	backBuffer.Present();
-}
-
-bool
 Game::IsPlayGameMenuInMainMenuSelected()
 {
 	return m_playGameMenuInMainMenuSelected;
@@ -1104,4 +952,84 @@ Game::SelectQuitGameMenuInMainMenu()
 
 	m_playGameMenuInMainMenuSelected = false;
 	m_quitGameMenuInMainMenuSelected = true;
+}
+
+bool
+Game::HasMoreLives()
+{
+	return (m_numOfLivesLeft >= 1);
+}
+
+void
+Game::UpdatePlayerShip(PlayerShip* playerShip)
+{
+	if (playerShip->GetHealth() - DAMAGE_CAUSED_BY_ENEMY_BULLET <= 0)
+	{
+		playerShip->SetDead(true);
+		// Spawn explosion when the player ship dies.
+		SpawnExplosion(playerShip->GetPositionX(), playerShip->GetPositionY());
+
+		if (HasMoreLives())
+		{
+			--m_numOfLivesLeft;
+			SpawnPlayerShip();
+		}
+		else
+		{
+			//QuitGamePlay();
+			//Game::sm_gameState = GAME_SUMMARY;
+		}
+	}
+	else
+	{
+		playerShip->SetHealth(playerShip->GetHealth() - DAMAGE_CAUSED_BY_ENEMY_BULLET);
+	}
+}
+
+void
+Game::UpdateElapsedSecondsAndFrameCount(float deltaTime)
+{
+	// Count total simulation time elapsed:
+	m_elapsedSeconds += deltaTime;
+
+	// Frame Counter:
+	if (m_elapsedSeconds > 1)
+	{
+		m_elapsedSeconds -= 1;
+		m_FPS = m_frameCount;
+		m_frameCount = 0;
+	}
+}
+
+void
+Game::GenericLoop(bool looping)
+{
+	const float STEP_SIZE = 1.0f / 60.0f;
+
+	assert(m_pInputHandler);
+	m_pInputHandler->ProcessInput(*this);
+
+	if (looping)
+	{
+		int current = SDL_GetTicks();
+		float deltaTime = (current - m_lastTime) / 1000.0f;
+		m_lastTime = current;
+
+		m_executionTime += deltaTime;
+
+		m_lag += deltaTime;
+
+		while (m_lag >= STEP_SIZE)
+		{
+			Process(STEP_SIZE);
+
+			m_lag -= STEP_SIZE;
+
+			++m_numUpdates;
+		}
+
+		Draw(*m_pBackBuffer);
+	}
+
+	//	SDL_Delay(1);
 }

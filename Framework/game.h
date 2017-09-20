@@ -36,6 +36,7 @@ public:
 
 	bool Initialise();
 	void DoGameLoop();
+	void GenericLoop(bool looping);
 
 	void QuitGame();
 	void QuitSplashScreen();
@@ -72,14 +73,16 @@ private:
 	Game& operator=(const Game& game);
 	Game();
 
+	void UpdateElapsedSecondsAndFrameCount(float deltaTime);
+
 	bool CreateBackBuffer();
 	bool CreateInputHandler();
 	bool CreateTTFFont();
 	bool CreateFontColor(Uint8 r, Uint8 g, Uint8 b);
 
-	bool DoGamePlayLoop();
-	bool DoSplashScreenLoop();
-	bool DoMainMenuLoop();
+	void DoGamePlayLoop(bool gamePlayLooping);
+	void DoSplashScreenLoop(bool mainMenuLooping);
+	void DoMainMenuLoop(bool splashScreenLooping);
 	//bool DoPausedMenuLoop();
 	//bool DoGameSummaryLoop();
 
@@ -155,8 +158,8 @@ protected:
 	const static int MAX_NUM_OF_ENEMY = 100;
 	const static int MAX_NUM_OF_PLAYER_SHIP = 3;
 
-	const static int MAX_NUM_OF_PLAYER_BULLETS = 30;
-	const static int MAX_NUM_OF_ENEMY_BULLETS = 30;
+	const static int MAX_NUM_OF_PLAYER_BULLETS = 50;
+	const static int MAX_NUM_OF_ENEMY_BULLETS = 50;
 	const static int MAX_NUM_OF_EXPLOSIONS = 100;
 	const static int MAX_NUM_OF_ANIMATEDSPRITE = 100;
 
