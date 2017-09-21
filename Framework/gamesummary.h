@@ -4,6 +4,7 @@
 
 // Local includes:
 #include "entity.h"
+#include "SDL.h"
 
 class TextTexture;
 
@@ -17,6 +18,8 @@ public:
 	void Process(float deltaTime);
 	void Initialise(Sprite* sprite);
 
+	void SetContent(int score, int health, int numOfEnemy, int numOfBoss);
+
 protected:
 
 private:
@@ -27,10 +30,17 @@ private:
 public:
 
 protected:
+	SDL_Color* m_pFontColor;
+
 	TextTexture* m_pScoreTextTexture;
 	TextTexture* m_pHealthTextTexture;
 	TextTexture* m_pNumberOfEnemyTextTexture;
 	TextTexture* m_pBossTextTexture;
+
+	int m_score;
+	int m_health;
+	int m_numOfEnemy;
+	int m_numOfBoss;
 
 private:
 

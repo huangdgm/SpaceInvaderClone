@@ -60,6 +60,7 @@ public:
 	void SpawnExplosion(float x, float y);
 
 	bool HasMoreLives();
+	bool HasMoreEnemies();
 	void UpdatePlayerShip(PlayerShip* playerShip);
 
 	bool IsPlayGameMenuInMainMenuSelected();
@@ -118,6 +119,15 @@ public:
 
 	const static int WIDTH_OF_ANIMATED_SPRITE_FRAME = 64;
 	const static int HEIGHT_OF_ANIMATED_SPRITE_FRAME = 64;
+
+	const static int SCORE_POSITION_X = 690;
+	const static int SCORE_POSITION_Y = 60;
+	const static int LEVEL_POSITION_X = 700;
+	const static int LEVEL_POSITION_Y = 250;
+	const static int LIVES_POSITION_X = 736;
+	const static int LIVES_POSITION_Y = 410;
+	const static int HEALTH_POSITION_X = 665;
+	const static int HEALTH_POSITION_Y = 580;
 
 protected:
 	static Game* sm_pInstance;
@@ -183,15 +193,6 @@ protected:
 	const static int DAMAGE_CAUSED_BY_ENEMY_BULLET = 34;
 	const static int DAMAGE_CAUSED_BY_PLAYERSHIP_BULLET = 20;
 	const static int LEVEL_TIME_DURATION = 30;
-
-	const static int SCORE_POSITION_X = 690;
-	const static int SCORE_POSITION_Y = 60;
-	const static int LEVEL_POSITION_X = 700;
-	const static int LEVEL_POSITION_Y = 250;
-	const static int LIVES_POSITION_X = 736;
-	const static int LIVES_POSITION_Y = 410;
-	const static int HEALTH_POSITION_X = 665;
-	const static int HEALTH_POSITION_Y = 580;
 
 	int m_indexOfPlayerBullet;
 	int m_indexOfEnemyBullet;

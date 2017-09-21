@@ -62,13 +62,18 @@ Entity::IsCollidingWith(Entity& e)
 	double distance = 0.0;
 	bool isCollid = false;
 
-	double radiusOfThis = this->m_pSprite->GetHeight() / sqrt(2);
-	double radiusOfE = e.m_pSprite->GetHeight() / sqrt(2);
+	double this_radius = this->m_pSprite->GetHeight() / sqrt(2);
+	double entity_radius = e.m_pSprite->GetHeight() / sqrt(2);
 	
-	distance = sqrt(pow((e.GetPositionX() - this->GetPositionX()), 2) + pow((e.GetPositionY() - this->GetPositionY()), 2));
+	float this_CenterX = this->GetPositionX() + (m_pSprite->GetWidth() / 2);
+	float this_CenterY = this->GetPositionY() + (m_pSprite->GetHeight() / 2);
+	float entity_CenterX = e.GetPositionX() + (e.m_pSprite->GetWidth() / 2);
+	float entity_CenterY = e.GetPositionY() + (e.m_pSprite->GetHeight() / 2);
+
+	distance = sqrt(pow((entity_CenterX - this_CenterX), 2) + pow((entity_CenterY - this_CenterY), 2));
 
 	// Check for intersection.
-	if (distance <= radiusOfThis + radiusOfE)
+	if (distance <= this_radius + entity_radius)
 	{
 		isCollid = true;
 	}

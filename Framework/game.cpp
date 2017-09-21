@@ -922,6 +922,13 @@ Game::ProcessGamePlay(float deltaTime)
 	m_pLivesTextTexture->LoadFromRenderedText(to_string(m_numOfLivesLeft), *m_pFontColor);
 	// Todo: create the GetCurrentPlayerShip() method.
 	m_pHealthTextTexture->LoadFromRenderedText(to_string((m_pPlayerShip + m_indexOfPlayerShip - 1)->GetHealth()), *m_pFontColor);
+
+	// Check for game over
+	if (!HasMoreEnemies())
+	{
+		QuitGamePlay();
+		Game::sm_gameState = GAME_SUMMARY;
+	}
 }
 
 void
@@ -1085,6 +1092,27 @@ bool
 Game::HasMoreLives()
 {
 	return (m_numOfLivesLeft >= 1);
+}
+
+bool
+Game::HasMoreEnemies()
+{
+	bool result = false;
+
+	for (Enemy* enemy = m_pEnemy; enemy < m_pEnemy + MAX_NUM_OF_ENEMY; enemy++)
+	{
+		if (!(enemy->IsDead()))
+		{
+			result = true;
+		}
+	}
+
+	if (!(m_pBoss->IsDead()))
+	{
+		result = true;
+	}
+
+	return result;
 }
 
 void
